@@ -16,6 +16,8 @@
 #include <d3dx9math.h>
 #include "Camera.h"
 #include "LineObject.h"
+#include "Quad.h"
+#include "Road.h"
 
 
 class ColoredCubeApp : public D3DApp
@@ -39,9 +41,10 @@ private:
 	Vector3 lookAt;
 	Camera camera;
 
-	//Add line, box, and gameobject definitions here
+	Line line;
 
-	//Add matrices for world transforms here
+	Road road[ROADS];
+	LineObject xLine, yLine, zLine;
 
 	float spinAmount;
 
@@ -109,8 +112,33 @@ void ColoredCubeApp::initApp()
 
 
 	//CAMERA initialization here
-	camera.init(Vector3(0,0,0), Vector3(0,0,0), Vector3(1,0,0));
+	camera.init(Vector3(0,0,0), Vector3(0,0,0), Vector3(0,0,10));
 	camera.setPerspective();
+
+	line.init(md3dDevice, 1.0f, WHITE);
+	xLine.init(&line, Vector3(0,0,0), 5);
+	xLine.setPosition(Vector3(0,0,0));
+	yLine.init(&line, Vector3(0,0,0), 5);
+	yLine.setPosition(Vector3(0,0,0));
+	yLine.setRotationZ(ToRadian(90));
+	zLine.init(&line, Vector3(0,0,0), 5);
+	zLine.setPosition(Vector3(0,0,0));
+	zLine.setRotationY(ToRadian(270));
+
+	D3DXCOLOR colors [ROADS] = {YELLOW, GREEN, BLUE};
+
+	float roadZLength = 100.0f;
+
+	float zPos = 0;
+
+	for(int i = 0;i<ROADS;i++)
+	{
+		road[i].init(md3dDevice,1, colors[i]);
+		road[i].setPosition(Vector3(0,-1.2,zPos));
+		zPos += roadZLength;
+	}
+
+	
 
 }
 
@@ -125,6 +153,14 @@ void ColoredCubeApp::onResize()
 void ColoredCubeApp::updateScene(float dt)
 {
 	D3DApp::updateScene(dt);
+	xLine.update(dt);
+	yLine.update(dt);
+	zLine.update(dt);
+
+	for(int i = 0;i<ROADS;i++)
+	{
+		road[i].update(dt);
+	}
 
 	camera.update(dt);
 	//ADD UPDATES HERE
@@ -147,6 +183,38 @@ void ColoredCubeApp::drawScene()
 	//Camera view and projection matrices
 	 mView = camera.getViewMatrix();
 	 mProj = camera.getProjectionMatrix();
+
+	 mWVP = xLine.getWorldMatrix()*mView*mProj;
+	mfxWVPVar->SetMatrix((float*)&mWVP);
+	xLine.setMTech(mTech);
+	xLine.draw();
+
+	mWVP = yLine.getWorldMatrix() *mView*mProj;
+	mfxWVPVar->SetMatrix((float*)&mWVP);
+	yLine.setMTech(mTech);
+	yLine.draw();
+
+	mWVP = zLine.getWorldMatrix() *mView*mProj;
+	mfxWVPVar->SetMatrix((float*)&mWVP);
+	zLine.setMTech(mTech);
+	zLine.draw();
+
+	D3D10_TECHNIQUE_DESC techDesc;
+	mTech->GetDesc(&techDesc);
+
+	for(int i = 0;i<ROADS;i++)
+	{
+		mWVP = road[i].getWorld()*mView*mProj;
+		mfxWVPVar->SetMatrix((float*)&mWVP);
+		mTech->GetDesc( &techDesc );
+		for(UINT p = 0; p < techDesc.Passes; ++p)
+		{
+			mTech->GetPassByIndex( p )->Apply(0);
+			road[i].draw();
+		}
+	}
+
+	
 
 	
 	// We specify DT_NOCLIP, so we do not care about width/height of the rect.

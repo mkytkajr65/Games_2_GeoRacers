@@ -22,6 +22,18 @@ Camera::~Camera()
 
 void Camera::init(Vector3 position, Vector3 direction, Vector3 _lookAt)
 {
+	this->position = position;
+	//this->direction = direction;
+	this->lookAt = _lookAt;
+	speed = 10;
+	FoV = 0.25*PI;
+	aspectRatio = 480.0f/640.0f;
+	nearClippingPlane = 1.0f;
+	farClippingPlane = 1000.0f;
+	up = Vector3(0.0f, 1.0f, 0.0f);
+	yaw = 0;
+	roll = 0;
+	pitch = 0;
 }
 
 void Camera::setPerspective()
@@ -89,13 +101,13 @@ void Camera::update(float dt)
 
 
 	if(GetAsyncKeyState('A') & 0x8000)
-			direction.z = 1;
-	if(GetAsyncKeyState('D') & 0x8000)
-			direction.z = -1;
-	if(GetAsyncKeyState('S') & 0x8000)
 			direction.x = -1;
-	if(GetAsyncKeyState('W') & 0x8000)
+	if(GetAsyncKeyState('D') & 0x8000)
 			direction.x = 1;
+	if(GetAsyncKeyState('S') & 0x8000)
+			direction.z = -1;
+	if(GetAsyncKeyState('W') & 0x8000)
+			direction.z = 1;
 
 
 	D3DXVec3Normalize(&direction, &direction);
@@ -107,7 +119,7 @@ void Camera::update(float dt)
 
 	if (yawUpdate)
 	{
-	Vector3 transformedRef = Vector3(1,0,0);   
+	Vector3 transformedRef = Vector3(0,0,1);   
 	Transform(&transformedRef, &transformedRef,&temp); //
 	D3DXVec3Normalize(&transformedRef, &transformedRef);
     lookAt = transformedRef * 10;
@@ -118,6 +130,7 @@ void Camera::update(float dt)
 	yawUpdate = false;
 	}
 	else{
+
 		lookAt += direction;
 	//_RPT1(0,"lookAt x %f ", lookAt.x);
 	//_RPT1(0,"  lookAt z %f\n",lookAt.z);
