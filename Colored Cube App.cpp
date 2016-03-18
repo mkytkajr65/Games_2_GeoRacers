@@ -40,6 +40,10 @@ private:
 	Camera camera;
 
 	//Add line, box, and gameobject definitions here
+	Box pKart, cKart;
+	GameObject playerKart;
+	GameObject CPUKarts[7];
+
 
 	//Add matrices for world transforms here
 
@@ -107,9 +111,23 @@ void ColoredCubeApp::initApp()
 
 	spinAmount = 0;
 
+	pKart.init(md3dDevice, 1, BLUE);
+	cKart.init(md3dDevice, 1, RED);
+
+	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,-3),20,1);
+
+	for(int i = 0; i < 7; i++) {
+		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(-3,0,0),0,1);
+		if (i==0) {
+			CPUKarts[i].setPosition(Vector3(playerKart.getPosition().x + 1.5, 0,playerKart.getPosition().z + 2));
+		}
+		else {
+			CPUKarts[i].setPosition(Vector3(CPUKarts[i-1].getPosition().x + 1.5, 0,CPUKarts[i-1].getPosition().z + 2));
+		}
+	}
 
 	//CAMERA initialization here
-	camera.init(Vector3(0,0,0), Vector3(0,0,0), Vector3(1,0,0));
+	camera.init(Vector3(playerKart.getPosition().x + 10,playerKart.getPosition().y + 2,playerKart.getPosition().z), Vector3(0,0,0), Vector3(-1,.2,0));
 	camera.setPerspective();
 
 }
@@ -128,6 +146,24 @@ void ColoredCubeApp::updateScene(float dt)
 
 	camera.update(dt);
 	//ADD UPDATES HERE
+	Vector3 direction = Vector3(0,0,0);
+	if(GetAsyncKeyState('A') & 0x8000)
+			direction.z = -1;
+	if(GetAsyncKeyState('D') & 0x8000)
+			direction.z = 1;
+	if(GetAsyncKeyState('S') & 0x8000)
+			direction.x = 1;
+	if(GetAsyncKeyState('W') & 0x8000)
+			direction.x = -1;
+
+
+	D3DXVec3Normalize(&direction, &direction);
+	playerKart.setVelocity(playerKart.getSpeed() * direction);
+
+	playerKart.update(dt);
+	for (int i = 0; i < 7; i++) {
+		CPUKarts[i].update(dt);
+	}
 	
 	spinAmount += 1*dt;
 	if (spinAmount > 360)
@@ -147,6 +183,19 @@ void ColoredCubeApp::drawScene()
 	//Camera view and projection matrices
 	 mView = camera.getViewMatrix();
 	 mProj = camera.getProjectionMatrix();
+
+	 for(int i = 0; i < 7; i++)
+	{
+		mWVP = CPUKarts[i].getWorldMatrix()*mView*mProj;
+		mfxWVPVar->SetMatrix((float*)&mWVP);
+		CPUKarts[i].setMTech(mTech);
+		CPUKarts[i].draw();
+	}
+	
+	 mWVP = playerKart.getWorldMatrix()*mView*mProj;
+	mfxWVPVar->SetMatrix((float*)&mWVP);
+	playerKart.setMTech(mTech);
+	playerKart.draw();
 
 	
 	// We specify DT_NOCLIP, so we do not care about width/height of the rect.
