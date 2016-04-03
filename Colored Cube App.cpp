@@ -42,6 +42,10 @@ private:
 	Camera camera;
 
 	Line line;
+	//Add line, box, and gameobject definitions here
+	Box pKart, cKart;
+	GameObject playerKart;
+	GameObject CPUKarts[7];
 
 	Road road[ROADS];
 	LineObject xLine, yLine, zLine;
@@ -110,6 +114,20 @@ void ColoredCubeApp::initApp()
 
 	spinAmount = 0;
 
+	pKart.init(md3dDevice, 1, BLUE);
+	cKart.init(md3dDevice, 1, RED);
+
+	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,-3),0,1);
+
+	for(int i = 0; i < 7; i++) {
+		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(0,0,-3),0,1);
+		if (i==0) {
+			CPUKarts[i].setPosition(Vector3(playerKart.getPosition().x + 1.5, 0,playerKart.getPosition().z + 2));
+		}
+		else {
+			CPUKarts[i].setPosition(Vector3(CPUKarts[i-1].getPosition().x + 1.5, 0,CPUKarts[i-1].getPosition().z + 2));
+		}
+	}
 
 	//CAMERA initialization here
 	camera.init(Vector3(0,0,0), Vector3(0,0,0), Vector3(0,0,10));
@@ -164,6 +182,10 @@ void ColoredCubeApp::updateScene(float dt)
 
 	camera.update(dt);
 	//ADD UPDATES HERE
+	playerKart.update(dt);
+	for (int i = 0; i < 7; i++) {
+		CPUKarts[i].update(dt);
+	}
 	
 	spinAmount += 1*dt;
 	if (spinAmount > 360)
@@ -214,7 +236,18 @@ void ColoredCubeApp::drawScene()
 		}
 	}
 
+	 for(int i = 0; i < 7; i++)
+	{
+		mWVP = CPUKarts[i].getWorldMatrix()*mView*mProj;
+		mfxWVPVar->SetMatrix((float*)&mWVP);
+		CPUKarts[i].setMTech(mTech);
+		CPUKarts[i].draw();
+	}
 	
+	 mWVP = playerKart.getWorldMatrix()*mView*mProj;
+	mfxWVPVar->SetMatrix((float*)&mWVP);
+	playerKart.setMTech(mTech);
+	playerKart.draw();
 
 	
 	// We specify DT_NOCLIP, so we do not care about width/height of the rect.
