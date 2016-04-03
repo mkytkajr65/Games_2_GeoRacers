@@ -12,6 +12,8 @@
 #include "d3dApp.h"
 #include "Box.h"
 #include "GameObject.h"
+#include "Obstacle.h"
+#include "ObstacleObject.h"
 #include "Line.h"
 #include <d3dx9math.h>
 #include "Camera.h"
@@ -44,8 +46,11 @@ private:
 	Line line;
 	//Add line, box, and gameobject definitions here
 	Box pKart, cKart;
+	Obstacle obstacle;
 	GameObject playerKart;
 	GameObject CPUKarts[7];
+
+	ObstacleObject obstacles[OBSTACLES];
 
 	Road road[ROADS];
 	LineObject xLine, yLine, zLine;
@@ -116,11 +121,40 @@ void ColoredCubeApp::initApp()
 
 	pKart.init(md3dDevice, 1, BLUE);
 	cKart.init(md3dDevice, 1, RED);
+	obstacle.init(md3dDevice, 1, GREEN);
 
 	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,-3),15,1);
 
+	D3DXCOLOR colors [ROADS] = {YELLOW, GREEN, BLUE};
+
+	float roadZLength = 100.0f;
+
+	float zPos = 0;
+
+	for(int i = 0;i<ROADS;i++)
+	{
+		road[i].init(md3dDevice,1, colors[i]);
+		road[i].setPosition(Vector3(0,-1.2,zPos));
+		zPos += roadZLength;
+	}
+
+	float randZPos, randXPos;
+
+	float totalRoadZLength = roadZLength * ROADS;
+
+	float roadXLength = 20;
+
+	for(int i = 0; i < OBSTACLES; i++) {
+		obstacles[i].init(&obstacle,0,Vector3(0,0,0),Vector3(0,0,0),0,1);
+
+		randZPos = ((int)totalRoadZLength - 25) * ( (double)rand() / (double)RAND_MAX ) + 25;
+		randXPos = (rand() % (int)roadXLength)-10;
+
+		obstacles[i].setPosition(Vector3(randXPos, 0, randZPos));
+	}
+
 	for(int i = 0; i < 7; i++) {
-		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(-3,0,0),0,1);
+		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(0,0,0),0,1);
 		if (i==0) {
 			CPUKarts[i].setPosition(Vector3(playerKart.getPosition().x + 1.5, 0,playerKart.getPosition().z + 2));
 		}
@@ -144,22 +178,6 @@ void ColoredCubeApp::initApp()
 	zLine.init(&line, Vector3(0,0,0), 5);
 	zLine.setPosition(Vector3(0,0,0));
 	zLine.setRotationY(ToRadian(270));
-
-	D3DXCOLOR colors [ROADS] = {YELLOW, GREEN, BLUE};
-
-	float roadZLength = 100.0f;
-
-	float zPos = 0;
-
-	for(int i = 0;i<ROADS;i++)
-	{
-		road[i].init(md3dDevice,1, colors[i]);
-		road[i].setPosition(Vector3(0,-1.2,zPos));
-		zPos += roadZLength;
-	}
-
-	
-
 }
 
 void ColoredCubeApp::onResize()
@@ -202,6 +220,10 @@ void ColoredCubeApp::updateScene(float dt)
 	playerKart.update(dt);
 	for (int i = 0; i < 7; i++) {
 		CPUKarts[i].update(dt);
+	}
+
+	for (int i = 0; i < OBSTACLES; i++) {
+		obstacles[i].update(dt);
 	}
 	
 	spinAmount += 1*dt;
@@ -253,12 +275,20 @@ void ColoredCubeApp::drawScene()
 		}
 	}
 
-	 for(int i = 0; i < 7; i++)
+	for(int i = 0; i < 7; i++)
 	{
 		mWVP = CPUKarts[i].getWorldMatrix()*mView*mProj;
 		mfxWVPVar->SetMatrix((float*)&mWVP);
 		CPUKarts[i].setMTech(mTech);
 		CPUKarts[i].draw();
+	}
+
+	for(int i = 0; i < OBSTACLES; i++)
+	{
+		mWVP = obstacles[i].getWorldMatrix()*mView*mProj;
+		mfxWVPVar->SetMatrix((float*)&mWVP);
+		obstacles[i].setMTech(mTech);
+		obstacles[i].draw();
 	}
 	
 	 mWVP = playerKart.getWorldMatrix()*mView*mProj;
