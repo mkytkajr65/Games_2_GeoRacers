@@ -20,9 +20,8 @@ Camera::~Camera()
 	//nothing to deallocate
 }
 
-void Camera::init(Vector3 p, Vector3 dir, Vector3 _lookAt)
+void Camera::init(Vector3 p, Vector3 dir, Vector3 _lookAt, GameObject *pl)
 {
-	this->position = position;
 	//this->direction = direction;
 	this->lookAt = _lookAt;
 	speed = 10;
@@ -36,20 +35,22 @@ void Camera::init(Vector3 p, Vector3 dir, Vector3 _lookAt)
 	pitch = 0;
 	position = p;
 	direction = dir;
+	player = pl;
 }
 
 void Camera::setPerspective()
 {
 	D3DXMatrixPerspectiveFovLH(&mProj, FoV, aspectRatio, nearClippingPlane,farClippingPlane); 
 }
-void Camera::update(float dt)
+void Camera::update(float dt, Vector3 dir)
 {
+	//_RPT1(0, "Player position %f \n", player->getPosition().z);
 	bool yawUpdate = false;
 	float deltaYaw = 0;
 	float _speed = 20;
 	float deltaPitch = 0;
 
-	Vector3 direction = Vector3(0,0,0);
+	//Vector3 direction = Vector3(0,0,0);
 	Matrix yawR;
 	Matrix pitchR;
 	Matrix rollR;
@@ -58,7 +59,7 @@ void Camera::update(float dt)
 	Identity(&pitchR);
 	Identity(&rollR);
 
-	if(GetAsyncKeyState(VK_RIGHT) & 0x8000)
+	/*if(GetAsyncKeyState(VK_RIGHT) & 0x8000)
 	{
 		deltaYaw += _speed*dt;
 		yaw += deltaYaw;
@@ -97,27 +98,28 @@ void Camera::update(float dt)
 		//leftDownLastFrame = true;
 		_RPT1(0,"deltaPitch dec %f ", deltaPitch);
 		_RPT1(0, "Pitch %f \n", pitch);
-	}
+	}*/
 	/*RotateY(&yawR, ToRadian( yaw));
 	RotateZ(&pitchR, ToRadian(pitch));*/
 
 
-	if(GetAsyncKeyState('A') & 0x8000)
+	/*if(GetAsyncKeyState('A') & 0x8000)
 			direction.x = -1;
 	if(GetAsyncKeyState('D') & 0x8000)
 			direction.x = 1;
 	if(GetAsyncKeyState('S') & 0x8000)
 			direction.z = -1;
 	if(GetAsyncKeyState('W') & 0x8000)
-			direction.z = 1;
+			direction.z = 1;*/
 
 
-	D3DXVec3Normalize(&direction, &direction);
+	D3DXVec3Normalize(&dir, &dir);
 	Matrix temp = yawR;
-	Transform(&direction, &direction, &yawR);
-	Vector3 foo = direction;
-	direction = direction*_speed*dt;
-	position += direction;
+	Transform(&dir, &dir, &yawR);
+	Vector3 foo = dir;
+	dir = dir*player->getSpeed()*dt;
+	position += dir;
+	
 
 	if (yawUpdate)
 	{
@@ -133,9 +135,9 @@ void Camera::update(float dt)
 	}
 	else{
 
-		lookAt += direction;
-	//_RPT1(0,"lookAt x %f ", lookAt.x);
-	//_RPT1(0,"  lookAt z %f\n",lookAt.z);
+		lookAt += dir;
+	_RPT1(0,"lookAt x %f ", lookAt.x);
+	_RPT1(0,"  lookAt z %f\n",lookAt.z);
 	}
 	D3DXMatrixLookAtLH(&mView, &position, &lookAt, &up);
 }
