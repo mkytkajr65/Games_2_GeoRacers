@@ -8,7 +8,6 @@
 //
 //=============================================================================
 
-
 #include "d3dApp.h"
 #include "Box.h"
 #include "GameObject.h"
@@ -36,6 +35,8 @@ public:
 private:
 	void buildFX();
 	void buildVertexLayouts();
+
+	//Audio *audio;
  
 private:
 // Camera stuff
@@ -62,16 +63,12 @@ private:
 	ID3D10InputLayout* mVertexLayout;
 	ID3D10EffectMatrixVariable* mfxWVPVar;
 
-	ID3D10EffectVariable* mfxFLIPVar;
-
 	D3DXMATRIX mView;
 	D3DXMATRIX mProj;
 	D3DXMATRIX mWVP;
 
-
 	float mTheta;
 	float mPhi;
-
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
@@ -112,8 +109,6 @@ void ColoredCubeApp::initApp()
 {
 	D3DApp::initApp();
 
-	//Add box, line, and gameobject initialization here
-	
 	buildFX();
 	buildVertexLayouts();
 
@@ -183,7 +178,7 @@ void ColoredCubeApp::initApp()
 void ColoredCubeApp::onResize()
 {
 	D3DApp::onResize();
-	camera.setPerspective();
+
 	float aspect = (float)mClientWidth/mClientHeight;
 	D3DXMatrixPerspectiveFovLH(&mProj, 0.25f*PI, aspect, 1.0f, 1000.0f);
 }
@@ -194,11 +189,6 @@ void ColoredCubeApp::updateScene(float dt)
 	xLine.update(dt);
 	yLine.update(dt);
 	zLine.update(dt);
-
-	for(int i = 0;i<ROADS;i++)
-	{
-		road[i].update(dt);
-	}
 
 	//ADD UPDATES HERE
 	Vector3 direction = Vector3(0,0,0);
@@ -225,10 +215,10 @@ void ColoredCubeApp::updateScene(float dt)
 	for (int i = 0; i < OBSTACLES; i++) {
 		obstacles[i].update(dt);
 	}
-	
-	spinAmount += 1*dt;
-	if (spinAmount > 360)
-		spinAmount = 0;
+	for(int i = 0;i<ROADS;i++)
+	{
+		road[i].update(dt);
+	}
 
 }
 
@@ -296,7 +286,6 @@ void ColoredCubeApp::drawScene()
 	playerKart.setMTech(mTech);
 	playerKart.draw();
 
-	
 	// We specify DT_NOCLIP, so we do not care about width/height of the rect.
 	RECT R = {5, 5, 0, 0};
 	mFont->DrawText(0, mFrameStats.c_str(), -1, &R, DT_NOCLIP, BLACK);
@@ -329,8 +318,6 @@ void ColoredCubeApp::buildFX()
 	mTech = mFX->GetTechniqueByName("ColorTech");
 	
 	mfxWVPVar = mFX->GetVariableByName("gWVP")->AsMatrix();
-	mfxFLIPVar = mFX->GetVariableByName("flip");
-
 }
 
 void ColoredCubeApp::buildVertexLayouts()

@@ -101,15 +101,18 @@ void Camera::update(float dt, Vector3 dir)
 	}*/
 	/*RotateY(&yawR, ToRadian( yaw));
 	RotateZ(&pitchR, ToRadian(pitch));*/
-
-
 	/*if(GetAsyncKeyState('A') & 0x8000)
 			direction.x = -1;
-	if(GetAsyncKeyState('D') & 0x8000)
-			direction.x = 1;
-	if(GetAsyncKeyState('S') & 0x8000)
+=======
+	if(GetAsyncKeyState('A') & 0x8000)
 			direction.z = -1;
+>>>>>>> origin/master
+	if(GetAsyncKeyState('D') & 0x8000)
+			direction.z = 1;
+	if(GetAsyncKeyState('S') & 0x8000)
+			direction.x = 1;
 	if(GetAsyncKeyState('W') & 0x8000)
+<<<<<<< HEAD
 			direction.z = 1;*/
 
 
@@ -123,7 +126,7 @@ void Camera::update(float dt, Vector3 dir)
 
 	if (yawUpdate)
 	{
-	Vector3 transformedRef = Vector3(0,0,1);   
+	Vector3 transformedRef = Vector3(1,0,0);   
 	Transform(&transformedRef, &transformedRef,&temp); //
 	D3DXVec3Normalize(&transformedRef, &transformedRef);
     lookAt = transformedRef * 10;
