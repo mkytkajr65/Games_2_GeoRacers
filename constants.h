@@ -14,6 +14,10 @@
 #define ToDegree D3DXToDegree
 #define Transform D3DXVec3TransformCoord
 
+const int ROADS = 3;
+
+
+
 
 
 
