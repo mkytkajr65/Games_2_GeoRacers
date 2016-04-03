@@ -117,10 +117,10 @@ void ColoredCubeApp::initApp()
 	pKart.init(md3dDevice, 1, BLUE);
 	cKart.init(md3dDevice, 1, RED);
 
-	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,-3),0,1);
+	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,-3),20,1);
 
 	for(int i = 0; i < 7; i++) {
-		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(0,0,-3),0,1);
+		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(-3,0,0),0,1);
 		if (i==0) {
 			CPUKarts[i].setPosition(Vector3(playerKart.getPosition().x + 1.5, 0,playerKart.getPosition().z + 2));
 		}
@@ -130,7 +130,8 @@ void ColoredCubeApp::initApp()
 	}
 
 	//CAMERA initialization here
-	camera.init(Vector3(0,0,0), Vector3(0,0,0), Vector3(0,0,10));
+
+	camera.init(Vector3(playerKart.getPosition().x + 10,playerKart.getPosition().y + 2,playerKart.getPosition().z), Vector3(0,0,0), Vector3(-1,.2,0));
 	camera.setPerspective();
 
 	line.init(md3dDevice, 1.0f, WHITE);
@@ -182,6 +183,20 @@ void ColoredCubeApp::updateScene(float dt)
 
 	camera.update(dt);
 	//ADD UPDATES HERE
+	Vector3 direction = Vector3(0,0,0);
+	if(GetAsyncKeyState('A') & 0x8000)
+			direction.z = -1;
+	if(GetAsyncKeyState('D') & 0x8000)
+			direction.z = 1;
+	if(GetAsyncKeyState('S') & 0x8000)
+			direction.x = 1;
+	if(GetAsyncKeyState('W') & 0x8000)
+			direction.x = -1;
+
+
+	D3DXVec3Normalize(&direction, &direction);
+	playerKart.setVelocity(playerKart.getSpeed() * direction);
+
 	playerKart.update(dt);
 	for (int i = 0; i < 7; i++) {
 		CPUKarts[i].update(dt);

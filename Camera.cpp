@@ -20,7 +20,7 @@ Camera::~Camera()
 	//nothing to deallocate
 }
 
-void Camera::init(Vector3 position, Vector3 direction, Vector3 _lookAt)
+void Camera::init(Vector3 p, Vector3 dir, Vector3 _lookAt)
 {
 	this->position = position;
 	//this->direction = direction;
@@ -34,6 +34,8 @@ void Camera::init(Vector3 position, Vector3 direction, Vector3 _lookAt)
 	yaw = 0;
 	roll = 0;
 	pitch = 0;
+	position = p;
+	direction = dir;
 }
 
 void Camera::setPerspective()
@@ -44,7 +46,7 @@ void Camera::update(float dt)
 {
 	bool yawUpdate = false;
 	float deltaYaw = 0;
-	float _speed = 100;
+	float _speed = 20;
 	float deltaPitch = 0;
 
 	Vector3 direction = Vector3(0,0,0);
@@ -96,8 +98,8 @@ void Camera::update(float dt)
 		_RPT1(0,"deltaPitch dec %f ", deltaPitch);
 		_RPT1(0, "Pitch %f \n", pitch);
 	}
-	RotateY(&yawR, ToRadian( yaw));
-	RotateZ(&pitchR, ToRadian(pitch));
+	/*RotateY(&yawR, ToRadian( yaw));
+	RotateZ(&pitchR, ToRadian(pitch));*/
 
 
 	if(GetAsyncKeyState('A') & 0x8000)
@@ -114,7 +116,7 @@ void Camera::update(float dt)
 	Matrix temp = yawR;
 	Transform(&direction, &direction, &yawR);
 	Vector3 foo = direction;
-	direction = direction*_speed*.1*dt;
+	direction = direction*_speed*dt;
 	position += direction;
 
 	if (yawUpdate)

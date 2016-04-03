@@ -4,7 +4,7 @@
 GameObject::GameObject()
 {
 	radius = 0;
-	speed = 0;
+	speed = 20;
 	active = true;
 	Identity(&world);
 	rotX = 0;
