@@ -8,14 +8,12 @@
 //
 //=============================================================================
 
-
 #include "d3dApp.h"
 #include "Box.h"
-#include "GameObject.h"
-#include "Line.h"
-#include <d3dx9math.h>
-#include "Camera.h"
-#include "LineObject.h"
+#include "audio.h"
+#include "constants.h"
+#include "c:\Program Files (x86)\Windows Kits\8.0\Include\shared\winerror.h"
+
 
 
 class ColoredCubeApp : public D3DApp
@@ -32,38 +30,24 @@ public:
 private:
 	void buildFX();
 	void buildVertexLayouts();
+
+	Audio *audio;
  
 private:
-// Camera stuff
-	Vector3 cameraPos;
-	Vector3 lookAt;
-	Camera camera;
-
-	//Add line, box, and gameobject definitions here
-	Box pKart, cKart;
-	GameObject playerKart;
-	GameObject CPUKarts[7];
-
-
-	//Add matrices for world transforms here
-
-	float spinAmount;
+	
+	Box mBox;
 
 	ID3D10Effect* mFX;
 	ID3D10EffectTechnique* mTech;
 	ID3D10InputLayout* mVertexLayout;
 	ID3D10EffectMatrixVariable* mfxWVPVar;
 
-	ID3D10EffectVariable* mfxFLIPVar;
-
 	D3DXMATRIX mView;
 	D3DXMATRIX mProj;
 	D3DXMATRIX mWVP;
 
-
 	float mTheta;
 	float mPhi;
-
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
@@ -103,101 +87,99 @@ ColoredCubeApp::~ColoredCubeApp()
 void ColoredCubeApp::initApp()
 {
 	D3DApp::initApp();
-
-	//Add box, line, and gameobject initialization here
 	
+	mBox.init(md3dDevice, 1.0f);
+
 	buildFX();
 	buildVertexLayouts();
 
-	spinAmount = 0;
+	//audio
 
-	pKart.init(md3dDevice, 1, BLUE);
-	cKart.init(md3dDevice, 1, RED);
-
-	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,-3),20,1);
-
-	for(int i = 0; i < 7; i++) {
-		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(-3,0,0),0,1);
-		if (i==0) {
-			CPUKarts[i].setPosition(Vector3(playerKart.getPosition().x + 1.5, 0,playerKart.getPosition().z + 2));
+	audio = new Audio();
+    if (*WAVE_BANK != '\0' && *SOUND_BANK != '\0')  // if sound files defined
+    {
+		if (!audio->initialize()){
+			
 		}
-		else {
-			CPUKarts[i].setPosition(Vector3(CPUKarts[i-1].getPosition().x + 1.5, 0,CPUKarts[i-1].getPosition().z + 2));
-		}
-	}
 
-	//CAMERA initialization here
-	camera.init(Vector3(playerKart.getPosition().x + 10,playerKart.getPosition().y + 2,playerKart.getPosition().z), Vector3(0,0,0), Vector3(-1,.2,0));
-	camera.setPerspective();
-
+        /*if( FAILED( hr = audio->initialize() ) )
+        {
+            if( hr == HRESULT_FROM_WIN32( ERROR_FILE_NOT_FOUND ) )
+                throw(GameError(gameErrorNS::FATAL_ERROR, "Failed to initialize sound system because media file not found."));
+            else
+                throw(GameError(gameErrorNS::FATAL_ERROR, "Failed to initialize sound system."));
+        }*/
+    }
 }
 
 void ColoredCubeApp::onResize()
 {
 	D3DApp::onResize();
-	camera.setPerspective();
+
 	float aspect = (float)mClientWidth/mClientHeight;
 	D3DXMatrixPerspectiveFovLH(&mProj, 0.25f*PI, aspect, 1.0f, 1000.0f);
 }
 
 void ColoredCubeApp::updateScene(float dt)
 {
+	audio->run();
+
 	D3DApp::updateScene(dt);
 
-	camera.update(dt);
-	//ADD UPDATES HERE
-	Vector3 direction = Vector3(0,0,0);
+	// Update angles based on input to orbit camera around box.
 	if(GetAsyncKeyState('A') & 0x8000)
-			direction.z = -1;
-	if(GetAsyncKeyState('D') & 0x8000)
-			direction.z = 1;
-	if(GetAsyncKeyState('S') & 0x8000)
-			direction.x = 1;
-	if(GetAsyncKeyState('W') & 0x8000)
-			direction.x = -1;
-
-
-	D3DXVec3Normalize(&direction, &direction);
-	playerKart.setVelocity(playerKart.getSpeed() * direction);
-
-	playerKart.update(dt);
-	for (int i = 0; i < 7; i++) {
-		CPUKarts[i].update(dt);
+		{
+			mTheta -= 2.0f*dt;
+			audio->playCue(BEEP3);
 	}
-	
-	spinAmount += 1*dt;
-	if (spinAmount > 360)
-		spinAmount = 0;
+	if(GetAsyncKeyState('D') & 0x8000)	mTheta += 2.0f*dt;
+	if(GetAsyncKeyState('W') & 0x8000)	mPhi -= 2.0f*dt;
+	if(GetAsyncKeyState('S') & 0x8000)	mPhi += 2.0f*dt;
 
+	// Restrict the angle mPhi.
+	if( mPhi < 0.1f )	mPhi = 0.1f;
+	if( mPhi > PI-0.1f)	mPhi = PI-0.1f;
+
+	// Convert Spherical to Cartesian coordinates: mPhi measured from +y
+	// and mTheta measured counterclockwise from -z.
+	float x =  5.0f*sinf(mPhi)*sinf(mTheta);
+	float z = -5.0f*sinf(mPhi)*cosf(mTheta);
+	float y =  5.0f*cosf(mPhi);
+
+	// Build the view matrix.
+	D3DXVECTOR3 pos(x, y, z);
+	D3DXVECTOR3 target(0.0f, 0.0f, 0.0f);
+	D3DXVECTOR3 up(0.0f, 1.0f, 0.0f);
+	D3DXMatrixLookAtLH(&mView, &pos, &target, &up);
 }
 
 void ColoredCubeApp::drawScene()
 {
 	D3DApp::drawScene();
 
+	// Restore default states, input layout and primitive topology 
+	// because mFont->DrawText changes them.  Note that we can 
+	// restore the default states by passing null.
 	md3dDevice->OMSetDepthStencilState(0, 0);
 	float blendFactors[] = {0.0f, 0.0f, 0.0f, 0.0f};
 	md3dDevice->OMSetBlendState(0, blendFactors, 0xffffffff);
     md3dDevice->IASetInputLayout(mVertexLayout);
+    md3dDevice->IASetPrimitiveTopology(D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	//Camera view and projection matrices
-	 mView = camera.getViewMatrix();
-	 mProj = camera.getProjectionMatrix();
-
-	 for(int i = 0; i < 7; i++)
-	{
-		mWVP = CPUKarts[i].getWorldMatrix()*mView*mProj;
-		mfxWVPVar->SetMatrix((float*)&mWVP);
-		CPUKarts[i].setMTech(mTech);
-		CPUKarts[i].draw();
-	}
-	
-	 mWVP = playerKart.getWorldMatrix()*mView*mProj;
+   
+	// set constants
+	mWVP = mView*mProj;
 	mfxWVPVar->SetMatrix((float*)&mWVP);
-	playerKart.setMTech(mTech);
-	playerKart.draw();
 
-	
+    D3D10_TECHNIQUE_DESC techDesc;
+    mTech->GetDesc( &techDesc );
+    for(UINT p = 0; p < techDesc.Passes; ++p)
+    {
+        mTech->GetPassByIndex( p )->Apply(0);
+        
+		mBox.draw();
+    }
+
 	// We specify DT_NOCLIP, so we do not care about width/height of the rect.
 	RECT R = {5, 5, 0, 0};
 	mFont->DrawText(0, mFrameStats.c_str(), -1, &R, DT_NOCLIP, BLACK);
@@ -215,7 +197,7 @@ void ColoredCubeApp::buildFX()
  
 	ID3D10Blob* compilationErrors = 0;
 	HRESULT hr = 0;
-	hr = D3DX10CreateEffectFromFile(L"../Games_2_GeoRacers/color.fx", 0, 0, 
+	hr = D3DX10CreateEffectFromFile(L"color.fx", 0, 0, 
 		"fx_4_0", shaderFlags, 0, md3dDevice, 0, 0, &mFX, &compilationErrors, 0);
 	if(FAILED(hr))
 	{
@@ -230,8 +212,6 @@ void ColoredCubeApp::buildFX()
 	mTech = mFX->GetTechniqueByName("ColorTech");
 	
 	mfxWVPVar = mFX->GetVariableByName("gWVP")->AsMatrix();
-	mfxFLIPVar = mFX->GetVariableByName("flip");
-
 }
 
 void ColoredCubeApp::buildVertexLayouts()
