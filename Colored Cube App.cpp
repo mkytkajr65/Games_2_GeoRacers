@@ -11,6 +11,7 @@
 #include "d3dApp.h"
 #include "Box.h"
 #include "GameObject.h"
+#include "CPUKartObject.h"
 #include "Obstacle.h"
 #include "ObstacleObject.h"
 #include "Line.h"
@@ -19,6 +20,7 @@
 #include "LineObject.h"
 #include "Quad.h"
 #include "Road.h"
+#include "KartPlace.h"
 
 
 class ColoredCubeApp : public D3DApp
@@ -49,7 +51,7 @@ private:
 	Box pKart, cKart;
 	Obstacle obstacle;
 	GameObject playerKart;
-	GameObject CPUKarts[7];
+	CPUKartObject CPUKarts[CPU_KARTS];
 
 	ObstacleObject obstacles[OBSTACLES];
 
@@ -116,7 +118,7 @@ void ColoredCubeApp::initApp()
 
 	pKart.init(md3dDevice, 1, BLUE);
 	cKart.init(md3dDevice, 1, RED);
-	obstacle.init(md3dDevice, 1, GREEN);
+	obstacle.init(md3dDevice, 1, WHITE);
 
 	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,-3),15,1);
 
@@ -145,11 +147,15 @@ void ColoredCubeApp::initApp()
 		randZPos = ((int)totalRoadZLength - 25) * ( (double)rand() / (double)RAND_MAX ) + 25;
 		randXPos = (rand() % (int)roadXLength)-10;
 
-		obstacles[i].setPosition(Vector3(randXPos, 0, randZPos));
+		obstacles[i].setPosition(Vector3(randXPos, -1.2, randZPos));
 	}
 
-	for(int i = 0; i < 7; i++) {
-		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(0,0,0),0,1);
+	float randVelocity;
+	int maxVelocity = 10.0;
+
+	for(int i = 0; i < CPU_KARTS; i++) {
+		randVelocity  = rand() % maxVelocity;
+		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(0,0,randVelocity),0,1);
 		if (i==0) {
 			CPUKarts[i].setPosition(Vector3(playerKart.getPosition().x + 1.5, 0,playerKart.getPosition().z + 2));
 		}
@@ -208,7 +214,7 @@ void ColoredCubeApp::updateScene(float dt)
 	playerKart.setVelocity(playerKart.getSpeed() * direction);
 
 	playerKart.update(dt);
-	for (int i = 0; i < 7; i++) {
+	for (int i = 0; i < CPU_KARTS; i++) {
 		CPUKarts[i].update(dt);
 	}
 
@@ -220,6 +226,24 @@ void ColoredCubeApp::updateScene(float dt)
 		road[i].update(dt);
 	}
 
+	for(int i = 0;i<OBSTACLES;i++)
+	{
+		if(playerKart.collided(&obstacles[i]))
+		{
+			playerKart.setVelocity(Vector3(0,0,0));
+		}
+	}
+	KartPlace place;
+	GameObject allKarts[CPU_KARTS+1];
+
+	for(int i = 0;i<CPU_KARTS;i++)
+	{
+		allKarts[i] = CPUKarts[i];
+	}
+
+	allKarts[CPU_KARTS] = playerKart;
+
+	GameObject* places = place.getKartsPlaces(allKarts, CPU_KARTS+1);
 }
 
 void ColoredCubeApp::drawScene()
@@ -265,7 +289,7 @@ void ColoredCubeApp::drawScene()
 		}
 	}
 
-	for(int i = 0; i < 7; i++)
+	for(int i = 0; i < CPU_KARTS; i++)
 	{
 		mWVP = CPUKarts[i].getWorldMatrix()*mView*mProj;
 		mfxWVPVar->SetMatrix((float*)&mWVP);

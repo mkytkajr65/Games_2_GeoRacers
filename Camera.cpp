@@ -139,8 +139,6 @@ void Camera::update(float dt, Vector3 dir)
 	else{
 
 		lookAt += dir;
-	_RPT1(0,"lookAt x %f ", lookAt.x);
-	_RPT1(0,"  lookAt z %f\n",lookAt.z);
 	}
 	D3DXMatrixLookAtLH(&mView, &position, &lookAt, &up);
 }

@@ -26,12 +26,12 @@ void Obstacle::init(ID3D10Device* device, float scale, D3DXCOLOR c)
     Vertex vertices[] =
     {
 		{D3DXVECTOR3(-0.5f, 0.0f, -2.0f), c},
-		{D3DXVECTOR3(-0.5f, +3.0f, -2.0f), c},
-		{D3DXVECTOR3(+0.5f, +3.0f, -2.0f), c},
+		{D3DXVECTOR3(-0.5f, +5.0f, -2.0f), c},
+		{D3DXVECTOR3(+0.5f, +5.0f, -2.0f), c},
 		{D3DXVECTOR3(+0.5f, 0.0f, -2.0f), c},
 		{D3DXVECTOR3(-0.5f, 0.0f, +2.0f), c},
-		{D3DXVECTOR3(-0.5f, +3.0f, +2.0f), c},
-		{D3DXVECTOR3(+0.5f, +3.0f, +2.0f), c},
+		{D3DXVECTOR3(-0.5f, +5.0f, +2.0f), c},
+		{D3DXVECTOR3(+0.5f, +5.0f, +2.0f), c},
 		{D3DXVECTOR3(+0.5f, 0.0f, +2.0f), c},
     };
 

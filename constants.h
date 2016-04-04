@@ -16,6 +16,7 @@
 
 const int ROADS = 3;
 const int OBSTACLES = 20;
+const int CPU_KARTS = 3;
 
 
 

@@ -6,6 +6,7 @@
 #include "d3dUtil.h"
 #include "Box.h"
 #include "constants.h"
+#include "ObstacleObject.h"
 
 class GameObject
 {
@@ -35,6 +36,7 @@ public:
 	bool getActiveState() {return active;}
 	void setMTech(ID3D10EffectTechnique* m){ mTech = m;}
 	bool collided(GameObject *gameObject);
+	bool collided(ObstacleObject *obstacleObject);
 	void setRotationX(float r) {rotX = r;}
 	void setRotationY(float r) {rotY = r;}
 	void setRotationZ(float r) {rotZ = r;}
@@ -42,8 +44,7 @@ public:
 	//define setWorldMatrix here
 	void setWorldMatrix(Matrix w) {world = w;}
 
-
-private:
+protected:
 	Box *box; 
 	Vector3 position;
 	Vector3 velocity;
