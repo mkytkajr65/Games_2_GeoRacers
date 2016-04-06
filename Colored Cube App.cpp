@@ -116,7 +116,7 @@ void ColoredCubeApp::initApp()
 
 	spinAmount = 0;
 
-	pKart.init(md3dDevice, 1, BLUE);
+	pKart.init(md3dDevice, 1, CHARCOAL_GREY);
 	cKart.init(md3dDevice, 1, RED);
 	obstacle.init(md3dDevice, 1, WHITE);
 
@@ -207,10 +207,10 @@ void ColoredCubeApp::updateScene(float dt)
 	if(GetAsyncKeyState('W') & 0x8000)
 			direction.z = 1;
 
-	camera.update(dt, direction);
-
-
 	D3DXVec3Normalize(&direction, &direction);
+
+	camera.update(dt, playerKart.getSpeed() * direction);
+
 	playerKart.setVelocity(playerKart.getSpeed() * direction);
 
 	playerKart.update(dt);
@@ -244,6 +244,8 @@ void ColoredCubeApp::updateScene(float dt)
 	allKarts[CPU_KARTS] = playerKart;
 
 	GameObject* places = place.getKartsPlaces(allKarts, CPU_KARTS+1);
+
+	place.printTopThree(places, CPU_KARTS+1);
 }
 
 void ColoredCubeApp::drawScene()

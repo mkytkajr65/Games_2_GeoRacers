@@ -42,7 +42,7 @@ void Camera::setPerspective()
 {
 	D3DXMatrixPerspectiveFovLH(&mProj, FoV, aspectRatio, nearClippingPlane,farClippingPlane); 
 }
-void Camera::update(float dt, Vector3 dir)
+void Camera::update(float dt, Vector3 vel)
 {
 	//_RPT1(0, "Player position %f \n", player->getPosition().z);
 	bool yawUpdate = false;
@@ -115,12 +115,11 @@ void Camera::update(float dt, Vector3 dir)
 <<<<<<< HEAD
 			direction.z = 1;*/
 
-
-	D3DXVec3Normalize(&dir, &dir);
+	Vector3 dir = vel;
 	Matrix temp = yawR;
 	Transform(&dir, &dir, &yawR);
 	Vector3 foo = dir;
-	dir = dir*player->getSpeed()*dt;
+	dir = dir*dt;
 	position += dir;
 	
 
