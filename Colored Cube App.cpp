@@ -67,6 +67,8 @@ private:
 	/*Light mLight2;
 	Light mLight3;*/
 
+	bool gameOver;
+
 	float spinAmount;
 
 	ID3D10Effect* mFX;
@@ -129,6 +131,8 @@ void ColoredCubeApp::initApp()
 	buildVertexLayouts();
 
 	spinAmount = 0;
+
+	gameOver = false;
 
 	playerPosition = -1;
 
@@ -367,8 +371,10 @@ void ColoredCubeApp::updateScene(float dt)
 
 	playerPosition = place.getPlayerPosition(places, CPU_KARTS+1);
 
-	if(playerPosition != -1){//if player has a valid position
-		_RPT1(0,"Velocity X %d ", playerPosition);
+	for(int i = 0;i<CPU_KARTS+1;i++){
+		if(allKarts[i].getPosition().z + 4.0f >= (ROADS * ROAD_LENGTH)){
+			gameOver = true;
+		}
 	}
 }
 
