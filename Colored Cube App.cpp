@@ -77,15 +77,12 @@ private:
 	ID3D10EffectTechnique* mTech;
 	ID3D10InputLayout* mVertexLayout;
 	ID3D10EffectMatrixVariable* mfxWVPVar;
-	ID3D10EffectMatrixVariable* mfxWorldVar;
 	ID3D10EffectVariable* mfxEyePosVar;
 	ID3D10EffectVariable* mfxLightVar;
 	ID3D10EffectScalarVariable* mfxLightType;
 
 
 	ID3D10EffectMatrixVariable* mfxWorldVar;
-	ID3D10EffectVariable* mfxEyePosVar;
-	ID3D10EffectVariable* mfxLightVar;
 	ID3D10EffectShaderResourceVariable* mfxDiffuseMapVar;
 	ID3D10EffectShaderResourceVariable* mfxSpecMapVar;
 	
@@ -145,7 +142,7 @@ void ColoredCubeApp::initApp()
 
 	
 	gameStates = gameMenu;
-	mCarMesh.init(md3dDevice, 1.0f);
+	//mCarMesh.init(md3dDevice, 1.0f);
 
 	mParallelLight.dir      = D3DXVECTOR3(0.57735f, -0.57735f, 0.57735f);
 	mParallelLight.ambient  = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
@@ -546,22 +543,21 @@ void ColoredCubeApp::buildFX()
 
 void ColoredCubeApp::buildVertexLayouts()
 {
-	// Create the vertex input layout.
-	D3D10_INPUT_ELEMENT_DESC vertexDesc[] =
-	{
+       // Create the vertex input layout.
+       D3D10_INPUT_ELEMENT_DESC vertexDesc[] =
+       {
+              {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+              //{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
+              {"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
+              {"DIFFUSE",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
+              {"SPECULAR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 40, D3D10_INPUT_PER_VERTEX_DATA, 0}
+       };
 
-		//{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
-		{"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
-		{"DIFFUSE",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
-		{"SPECULAR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 40, D3D10_INPUT_PER_VERTEX_DATA, 0}
-
-	};
-
-	// Create the input layout
+       // Create the input layout
     D3D10_PASS_DESC PassDesc;
     mTech->GetPassByIndex(0)->GetDesc(&PassDesc);
-
-    HR(md3dDevice->CreateInputLayout(vertexDesc, 4, PassDesc.pIAInputSignature,PassDesc.IAInputSignatureSize, &mVertexLayout));
+    HR(md3dDevice->CreateInputLayout(vertexDesc, 4, PassDesc.pIAInputSignature,
+              PassDesc.IAInputSignatureSize, &mVertexLayout));
 }
 
  
