@@ -54,6 +54,7 @@ private:
 	ID3D10ShaderResourceView* mSpecMapRV;
 	ID3D10ShaderResourceView* boxTexVar;
 	ID3D10ShaderResourceView* carTexVar;
+	ID3D10ShaderResourceView* splashTex;
 
 	GameStates gameStates ;
 
@@ -143,7 +144,7 @@ void ColoredCubeApp::initApp()
 	buildVertexLayouts();
 
 
-	gameStates = gamePlay;
+	gameStates = gameMenu;
 	//mCarMesh.init(md3dDevice, 1.0f);
 
 	mParallelLight.dir      = D3DXVECTOR3(0.57735f, -0.57735f, 0.57735f);
@@ -159,6 +160,9 @@ void ColoredCubeApp::initApp()
 		L"../Games_2_GeoRacers/box.png", 0, 0, &boxTexVar, 0 ));
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
 		L"../Games_2_GeoRacers/stripe.png", 0, 0, &carTexVar, 0 ));
+
+	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
+		L"../Games_2_GeoRacers/WoodCrate01.dds", 0, 0, &splashTex, 0 ));
 
 	spinAmount = 0;
 
@@ -294,15 +298,15 @@ void ColoredCubeApp::updateScene(float dt)
 
 		float velX, velY, velZ;
 
-	velX = playerKart.getVelocity().x;
-	for(int i = 0; i < ROADS; i++) {
-		if(playerKart.getPosition().x <= road[i].getPosition().x -10 && velX < 0)
-			velX = -velX/2;
-		if(playerKart.getPosition().x >= road[i].getPosition().x + 10 && velX > 0)
-			velX = -velX/2;
-	}
-	velY = 0.0;
-	velZ = playerKart.getVelocity().z;
+		velX = playerKart.getVelocity().x;
+		for(int i = 0; i < ROADS; i++) {
+			if(playerKart.getPosition().x <= road[i].getPosition().x -10 && velX < 0)
+				velX = -velX/2;
+			if(playerKart.getPosition().x >= road[i].getPosition().x + 10 && velX > 0)
+				velX = -velX/2;
+		}
+		velY = 0.0;
+		velZ = playerKart.getVelocity().z;
 
 		//ADD UPDATES HERE
 		Vector3 direction = Vector3(0,0,0);
@@ -382,23 +386,9 @@ void ColoredCubeApp::updateScene(float dt)
 			}
 		}
 		KartPlace place;
-	GameObject* allKarts = new GameObject[CPU_KARTS+1];
+		GameObject* allKarts = new GameObject[CPU_KARTS+1];
 
 
-
-		for(int j = 0;j<CPU_KARTS;j++)
-		{
-			for(int i = 0;i<OBSTACLES;i++)
-			{
-				if(CPUKarts[j].collided(&obstacles[i]) && !CPUKarts[j].getAlreadyCollided())
-				{
-					CPUKarts[j].setAlreadyCollided(true);
-					CPUKarts[j].setVelocity(Vector3(0,0,0));
-				}else if(!CPUKarts[j].collided(&obstacles[i]) && !CPUKarts[j].getAlreadyCollided()){
-					CPUKarts[j].setAlreadyCollided(false);
-				}
-			}
-		}
 		//KartPlace place;
 		//GameObject allKarts[CPU_KARTS+1];
 
@@ -422,130 +412,293 @@ void ColoredCubeApp::updateScene(float dt)
 			//place.printTopThree(places, CPU_KARTS+1);
 		}
 
-	
+
 	}
 	else if(gameStates == endGame){
+		splash.setPosition(playerKart.getPosition());
 		if(GetAsyncKeyState(VK_RETURN) & 0x8000){
-			gameStates = gamePlay;
+			gameStates = gameMenu;
+	//mCarMesh.init(md3dDevice, 1.0f);
+
+	mParallelLight.dir      = D3DXVECTOR3(0.57735f, -0.57735f, 0.57735f);
+	mParallelLight.ambient  = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
+	mParallelLight.diffuse  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	mParallelLight.specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
+		L"../Games_2_GeoRacers/test.png", 0, 0, &mDiffuseMapRV, 0 ));
+	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
+		L"../Games_2_GeoRacers/defaultspec.dds", 0, 0, &mSpecMapRV, 0 ));
+	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
+		L"../Games_2_GeoRacers/box.png", 0, 0, &boxTexVar, 0 ));
+	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
+		L"../Games_2_GeoRacers/stripe.png", 0, 0, &carTexVar, 0 ));
+
+	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
+		L"../Games_2_GeoRacers/WoodCrate01.dds", 0, 0, &splashTex, 0 ));
+
+	spinAmount = 0;
+
+	gameOver = false;
+
+	playerPosition = -1;
+
+	soundTimer = 0;
+
+	pKart.init(md3dDevice, 1, CHARCOAL_GREY);
+	cKart.init(md3dDevice, 1, RED);
+	obstacle.init(md3dDevice, 1, WHITE);
+
+	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,0),0,1);
+
+	D3DXCOLOR colors [ROADS] = {YELLOW, GREEN, BLUE};
+
+	splash.init(md3dDevice,1.0f,BLACK);
+
+	float roadZLength = 100.0f;
+
+	float zPos = 0;
+
+	for(int i = 0;i<ROADS;i++)
+	{
+		road[i].init(md3dDevice,1, colors[i]);
+		road[i].setPosition(Vector3(0,-1.2,zPos));
+		zPos += roadZLength;
 	}
-}
+
+	float randZPos, randXPos;
+
+	float totalRoadZLength = roadZLength * ROADS;
+
+	float roadXLength = 20;
+
+	for(int i = 0; i < OBSTACLES; i++) {
+		obstacles[i].init(&obstacle,0,Vector3(0,0,0),Vector3(0,0,0),0,1);
+
+		randZPos = ((int)totalRoadZLength - 25) * ( (double)rand() / (double)RAND_MAX ) + 25;
+		randXPos = (rand() % (int)roadXLength)-10;
+
+		obstacles[i].setPosition(Vector3(randXPos, -1.2, randZPos));
+	}
+
+	float randVelocity;
+	int maxVelocity = 10.0;
+
+	for(int i = 0; i < CPU_KARTS; i++) {
+		randVelocity  = rand() % maxVelocity + 1;
+		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(0,0,randVelocity),0,1);
+		if (i==0) {
+			CPUKarts[i].setPosition(Vector3(playerKart.getPosition().x + 1.5, 0,playerKart.getPosition().z + 2));
+		}
+		else {
+			CPUKarts[i].setPosition(Vector3(CPUKarts[i-1].getPosition().x + 1.5, 0,CPUKarts[i-1].getPosition().z + 2));
+		}
+	}
+
+	//CAMERA initialization here
+	mLight.dir      = D3DXVECTOR3(0.0f, -0.707f, -0.707f);
+	mLight.ambient  = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
+	mLight.diffuse  = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+	mLight.specular = D3DXCOLOR(1.0f, 1.0f, 0.0f, 0.0f);
+
+	/*mLight2.ambient  = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+	mLight2.diffuse  = D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f);
+	mLight2.specular = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+	mLight2.att.x    = 0.0f;
+	mLight2.att.y    = 0.0f;
+	mLight2.att.z    = 1.0f;
+	mLight2.spotPow  = 64.0f;
+	mLight2.range    = 10000.0f;
+	mLight2.pos = D3DXVECTOR3(playerKart.getPosition().x + .25, playerKart.getPosition().y, playerKart.getPosition().z);
+
+	mLight3.ambient  = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+	mLight3.diffuse  = D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f);
+	mLight3.specular = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+	mLight3.att.x    = 0.0f;
+	mLight3.att.y    = 0.0f;
+	mLight3.att.z    = 1.0f;
+	mLight3.spotPow  = 64.0f;
+	mLight3.range    = 10000.0f;
+	mLight3.pos = D3DXVECTOR3(playerKart.getPosition().x + .75, playerKart.getPosition().y, playerKart.getPosition().z);*/
+
+	//camera.init(Vector3(playerKart.getPosition().x + 10,playerKart.getPosition().y + 2,playerKart.getPosition().z), Vector3(0,0,0), Vector3(-1,.2,0));
+	camera.init(Vector3(0,2,-10), Vector3(0,0,0), Vector3(0,0,10), &playerKart);
+	camera.setPerspective();
+
+	audio = new Audio();
+	if (*WAVE_BANK != '\0' && *SOUND_BANK != '\0')  // if sound files defined
+	{
+		if (!audio->initialize()){
+
+		}
+	}
+
+	line.init(md3dDevice, 1.0f, WHITE);
+	xLine.init(&line, Vector3(0,0,0), 5);
+	xLine.setPosition(Vector3(0,0,0));
+	yLine.init(&line, Vector3(0,0,0), 5);
+	yLine.setPosition(Vector3(0,0,0));
+	yLine.setRotationZ(ToRadian(90));
+	zLine.init(&line, Vector3(0,0,0), 5);
+	zLine.setPosition(Vector3(0,0,0));
+	zLine.setRotationY(ToRadian(270));
+
+			//gameStates = gameMenu
+		}
+	}
 }
 
 void ColoredCubeApp::drawScene()
 {
 	D3DApp::drawScene();
-
-
-	mfxLightVar->SetRawValue(&mParallelLight, 0, sizeof(Light));
-
-	mfxDiffuseMapVar->SetResource(mDiffuseMapRV);
-	mfxSpecMapVar->SetResource(mSpecMapRV);
-
-	md3dDevice->OMSetDepthStencilState(0, 0);
-	float blendFactors[] = {0.0f, 0.0f, 0.0f, 0.0f};
-	md3dDevice->OMSetBlendState(0, blendFactors, 0xffffffff);
-	md3dDevice->IASetInputLayout(mVertexLayout);
-
 	//Camera view and projection matrices
 	mView = camera.getViewMatrix();
 	mProj = camera.getProjectionMatrix();
-
-	mWVP = xLine.getWorldMatrix()*mView*mProj;
-	mfxWVPVar->SetMatrix((float*)&mWVP);
-	xLine.setMTech(mTech);
-	xLine.draw();
-
-	mWVP = yLine.getWorldMatrix() *mView*mProj;
-	mfxWVPVar->SetMatrix((float*)&mWVP);
-	yLine.setMTech(mTech);
-	yLine.draw();
-
-	mWVP = zLine.getWorldMatrix() *mView*mProj;
-	mfxWVPVar->SetMatrix((float*)&mWVP);
-	zLine.setMTech(mTech);
-	zLine.draw();
-
-	D3DXMATRIX texMtx;
-	D3DXMatrixIdentity(&texMtx);
-	mfxTexMtxVar->SetMatrix((float*)&texMtx);
-
-
-	mfxEyePosVar->SetRawValue(cameraPos, 0, sizeof(D3DXVECTOR3));
-	mfxLightVar->SetRawValue(&mLight, 0, sizeof(Light));
-	mfxLightType->SetInt(0);
-
-
-	D3D10_TECHNIQUE_DESC techDesc;
-	mTech->GetDesc(&techDesc);
-
-	for(int i = 0;i<ROADS;i++)
-	{
-		mWVP = road[i].getWorld()*mView*mProj;
-		mfxWVPVar->SetMatrix((float*)&mWVP);
-		mTech->GetDesc( &techDesc );
-
-		for(UINT p = 0; p < techDesc.Passes; ++p)
+		if(gameStates == gamePlay)
 		{
-			mTech->GetPassByIndex( p )->Apply(0);
-			road[i].draw();
+			mfxLightVar->SetRawValue(&mParallelLight, 0, sizeof(Light));
+
+			mfxDiffuseMapVar->SetResource(mDiffuseMapRV);
+			mfxSpecMapVar->SetResource(mSpecMapRV);
+
+			md3dDevice->OMSetDepthStencilState(0, 0);
+			float blendFactors[] = {0.0f, 0.0f, 0.0f, 0.0f};
+			md3dDevice->OMSetBlendState(0, blendFactors, 0xffffffff);
+			md3dDevice->IASetInputLayout(mVertexLayout);
+
+
+			mWVP = xLine.getWorldMatrix()*mView*mProj;
+			mfxWVPVar->SetMatrix((float*)&mWVP);
+			xLine.setMTech(mTech);
+			xLine.draw();
+
+			mWVP = yLine.getWorldMatrix() *mView*mProj;
+			mfxWVPVar->SetMatrix((float*)&mWVP);
+			yLine.setMTech(mTech);
+			yLine.draw();
+
+			mWVP = zLine.getWorldMatrix() *mView*mProj;
+			mfxWVPVar->SetMatrix((float*)&mWVP);
+			zLine.setMTech(mTech);
+			zLine.draw();
+
+			D3DXMATRIX texMtx;
+			D3DXMatrixIdentity(&texMtx);
+			mfxTexMtxVar->SetMatrix((float*)&texMtx);
+
+
+			mfxEyePosVar->SetRawValue(cameraPos, 0, sizeof(D3DXVECTOR3));
+			mfxLightVar->SetRawValue(&mLight, 0, sizeof(Light));
+			mfxLightType->SetInt(0);
+
+
+			D3D10_TECHNIQUE_DESC techDesc;
+			mTech->GetDesc(&techDesc);
+
+			for(int i = 0;i<ROADS;i++)
+			{
+				mWVP = road[i].getWorld()*mView*mProj;
+				mfxWVPVar->SetMatrix((float*)&mWVP);
+				mTech->GetDesc( &techDesc );
+
+				for(UINT p = 0; p < techDesc.Passes; ++p)
+				{
+					mTech->GetPassByIndex( p )->Apply(0);
+					road[i].draw();
+				}
+			}
+
+
+			mfxDiffuseMapVar->SetResource(carTexVar);
+			mfxSpecMapVar->SetResource(mSpecMapRV);
+
+			for(int i = 0; i < CPU_KARTS; i++)
+			{
+				mWVP = CPUKarts[i].getWorldMatrix()*mView*mProj;
+				mfxWVPVar->SetMatrix((float*)&mWVP);
+				CPUKarts[i].setMTech(mTech);
+				CPUKarts[i].draw();
+			}
+			mfxDiffuseMapVar->SetResource(boxTexVar);
+			mfxSpecMapVar->SetResource(mSpecMapRV);
+
+			for(int i = 0; i < OBSTACLES; i++)
+			{
+				mWVP = obstacles[i].getWorldMatrix()*mView*mProj;
+				mfxWVPVar->SetMatrix((float*)&mWVP);
+				obstacles[i].setMTech(mTech);
+				obstacles[i].draw();
+			}
+			mfxDiffuseMapVar->SetResource(carTexVar);
+			mfxSpecMapVar->SetResource(mSpecMapRV);
+			mWVP = playerKart.getWorldMatrix()*mView*mProj;
+			mfxWVPVar->SetMatrix((float*)&mWVP);
+			playerKart.setMTech(mTech);
+			playerKart.draw();
+
+			std::wstring playerPositionText, gameOverText;
+
+			std::wostringstream outs;   
+			outs.precision(6);
+			switch (playerPosition)
+			{
+			case 1:
+				outs << playerPosition << "st";
+				break;
+			case 2: 
+				outs << playerPosition << "th";
+				break;
+			case 3: 
+				outs << playerPosition << "rd";
+				break;
+			default:
+				outs << playerPosition << "th";
+				break;
+			}
+			playerPositionText = outs.str();
+
+
+			// We specify DT_NOCLIP, so we do not care about width/height of the rect.
+			RECT playerPos = {mClientWidth-85, 10, mClientWidth, mClientHeight};
+			mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
+
 		}
-	}
+		else if (gameStates==gameMenu) {
+			mfxLightVar->SetRawValue(&mParallelLight, 0, sizeof(Light));
+
+			mfxDiffuseMapVar->SetResource(splashTex);
+			mfxSpecMapVar->SetResource(mSpecMapRV);
+			mWVP = playerKart.getWorldMatrix()*mView*mProj;
+			mfxWVPVar->SetMatrix((float*)&mWVP);
+			playerKart.setMTech(mTech);
+			splash.draw();
+
+		}
+		else if (gameStates==endGame) {
+			D3DXMATRIX texMtx;
+			D3DXMatrixIdentity(&texMtx);
+			mfxTexMtxVar->SetMatrix((float*)&texMtx);
 
 
-	mfxDiffuseMapVar->SetResource(carTexVar);
-	mfxSpecMapVar->SetResource(mSpecMapRV);
-
-	for(int i = 0; i < CPU_KARTS; i++)
-	{
-		mWVP = CPUKarts[i].getWorldMatrix()*mView*mProj;
-		mfxWVPVar->SetMatrix((float*)&mWVP);
-		CPUKarts[i].setMTech(mTech);
-		CPUKarts[i].draw();
-	}
-	mfxDiffuseMapVar->SetResource(boxTexVar);
-	mfxSpecMapVar->SetResource(mSpecMapRV);
-
-	for(int i = 0; i < OBSTACLES; i++)
-	{
-		mWVP = obstacles[i].getWorldMatrix()*mView*mProj;
-		mfxWVPVar->SetMatrix((float*)&mWVP);
-		obstacles[i].setMTech(mTech);
-		obstacles[i].draw();
-	}
-	mfxDiffuseMapVar->SetResource(carTexVar);
-	mfxSpecMapVar->SetResource(mSpecMapRV);
-	mWVP = playerKart.getWorldMatrix()*mView*mProj;
-	mfxWVPVar->SetMatrix((float*)&mWVP);
-	playerKart.setMTech(mTech);
-	playerKart.draw();
-
-	std::wstring playerPositionText, gameOverText;
-
-	std::wostringstream outs;   
-	outs.precision(6);
-	switch (playerPosition)
-	{
-		case 1:
-			outs << playerPosition << "st";
-			break;
-		case 2: 
-			outs << playerPosition << "th";
-			break;
-		case 3: 
-			outs << playerPosition << "rd";
-			break;
-		default:
-			outs << playerPosition << "th";
-			break;
-	}
-	playerPositionText = outs.str();
+			mfxEyePosVar->SetRawValue(cameraPos, 0, sizeof(D3DXVECTOR3));
+			mfxLightVar->SetRawValue(&mLight, 0, sizeof(Light));
+			mfxLightType->SetInt(0);
 
 
-	// We specify DT_NOCLIP, so we do not care about width/height of the rect.
-	RECT playerPos = {mClientWidth-85, 10, mClientWidth, mClientHeight};
-	mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
+			D3D10_TECHNIQUE_DESC techDesc;
+			mTech->GetDesc(&techDesc);
+			mfxLightVar->SetRawValue(&mParallelLight, 0, sizeof(Light));
+			mWVP = playerKart.getWorldMatrix()*mView*mProj;
+			mfxWVPVar->SetMatrix((float*)&mWVP);
+			playerKart.setMTech(mTech);
+			mfxDiffuseMapVar->SetResource(splashTex);
+			mfxSpecMapVar->SetResource(mSpecMapRV);
 
-	mSwapChain->Present(0, 0);
+			splash.draw();
+
+		}
+
+		mSwapChain->Present(0, 0);
 }
 
 void ColoredCubeApp::buildFX()
