@@ -40,12 +40,15 @@ public:
 	void setRotationX(float r) {rotX = r;}
 	void setRotationY(float r) {rotY = r;}
 	void setRotationZ(float r) {rotZ = r;}
+	void setAlreadyCollided(bool ac) {alreadyCollided = ac;}
+	bool getAlreadyCollided() {return alreadyCollided;}
 
 	//define setWorldMatrix here
 	void setWorldMatrix(Matrix w) {world = w;}
 
 protected:
 	Box *box; 
+	bool alreadyCollided;
 	Vector3 position;
 	Vector3 velocity;
 	float speed;

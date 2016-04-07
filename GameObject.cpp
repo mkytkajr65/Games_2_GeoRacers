@@ -10,6 +10,7 @@ GameObject::GameObject()
 	rotX = 0;
 	rotY = 0;
 	rotZ = 0;
+	alreadyCollided = false;
 }
 
 GameObject::~GameObject()
@@ -53,11 +54,35 @@ void GameObject::init(Box *b, float r, Vector3 pos, Vector3 vel, float sp, float
 	rotX = 0;
 	rotY = 0;
 	rotZ = 0;
+	alreadyCollided = false;
 }
 
 void GameObject::update(float dt)
 {
-	position += velocity*dt;
+	float velX, velY, velZ;
+	Vector3 newVel;
+
+	velX = getVelocity().x;
+	velY = 0.0;
+	velZ = getVelocity().z + PLAYER_ACCELERATION;
+
+	
+
+	if(velX > PLAYER_MAX_VELOCITY){
+		velX = PLAYER_MAX_VELOCITY ;
+	}else if(velX < -PLAYER_MAX_VELOCITY){
+		velX = -PLAYER_MAX_VELOCITY ;
+	}
+
+	if(velZ > PLAYER_MAX_VELOCITY){
+		velZ = PLAYER_MAX_VELOCITY ;
+	}else if(velZ < -PLAYER_MAX_VELOCITY){
+		velZ = -PLAYER_MAX_VELOCITY ;
+	}
+
+	newVel = Vector3(velX, 0, velZ);
+
+	position += newVel*dt;
 	Matrix rotXM, rotYM, rotZM, transM;
 	RotateX(&rotXM, rotX);
 	RotateY(&rotYM, rotY);

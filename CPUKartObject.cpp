@@ -20,8 +20,8 @@ CPUKartObject::~CPUKartObject()
 
 void CPUKartObject::update(float dt)
 {
-	position += velocity*dt;
-	_RPT1(0, "Rand Velocity %f \n", velocity.z);
+	position += velocity*PLAYER_MAX_VELOCITY*dt;
+	//_RPT1(0, "Rand Velocity %f \n", velocity.z);
 	Matrix rotXM, rotYM, rotZM, transM;
 	RotateX(&rotXM, rotX);
 	RotateY(&rotYM, rotY);

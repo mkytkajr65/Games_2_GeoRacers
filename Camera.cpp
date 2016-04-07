@@ -59,62 +59,6 @@ void Camera::update(float dt, Vector3 vel)
 	Identity(&pitchR);
 	Identity(&rollR);
 
-	/*if(GetAsyncKeyState(VK_RIGHT) & 0x8000)
-	{
-		deltaYaw += _speed*dt;
-		yaw += deltaYaw;
-		yawUpdate = true;
-		//rightDownLastFrame = true;
-		//_RPT1(0,"yaw inc %f", deltaYaw);
-		//_RPT1(0, "Yaw %f \n", yaw);
-	}
-	if(GetAsyncKeyState(VK_LEFT) & 0x8000)
-	{
-		yawUpdate = true;
-		deltaYaw -= _speed*dt;
-		yaw+= deltaYaw;
-		//leftDownLastFrame = true;
-		//_RPT1(0,"yaw dec %f ", deltaYaw);
-		//_RPT1(0, "Yaw %f \n", yaw);
-	}
-	if (GetAsyncKeyState(VK_UP) & 0x8000)
-	{
-		yawUpdate = true;
-		deltaPitch += _speed*dt;
-		if (deltaPitch > 1) 
-			deltaPitch = 1;
-		pitch += deltaPitch;
-		//leftDownLastFrame = true;
-		_RPT1(0,"deltaPitch dec %f ", deltaPitch);
-		_RPT1(0, "Pitch %f \n", pitch);
-	}
-		if (GetAsyncKeyState(VK_DOWN) & 0x8000)
-	{
-		yawUpdate = true;
-		deltaPitch -= _speed*dt;
-		if (deltaPitch < -1) 
-			deltaPitch = -1;
-		pitch += deltaPitch;
-		//leftDownLastFrame = true;
-		_RPT1(0,"deltaPitch dec %f ", deltaPitch);
-		_RPT1(0, "Pitch %f \n", pitch);
-	}*/
-	/*RotateY(&yawR, ToRadian( yaw));
-	RotateZ(&pitchR, ToRadian(pitch));*/
-	/*if(GetAsyncKeyState('A') & 0x8000)
-			direction.x = -1;
-=======
-	if(GetAsyncKeyState('A') & 0x8000)
-			direction.z = -1;
->>>>>>> origin/master
-	if(GetAsyncKeyState('D') & 0x8000)
-			direction.z = 1;
-	if(GetAsyncKeyState('S') & 0x8000)
-			direction.x = 1;
-	if(GetAsyncKeyState('W') & 0x8000)
-<<<<<<< HEAD
-			direction.z = 1;*/
-
 	Vector3 dir = vel;
 	Matrix temp = yawR;
 	Transform(&dir, &dir, &yawR);
