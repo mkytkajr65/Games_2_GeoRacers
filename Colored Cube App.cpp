@@ -179,8 +179,8 @@ void ColoredCubeApp::initApp()
 	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,0),0,1);
 
 	D3DXCOLOR colors [ROADS] = {YELLOW, GREEN, BLUE};
-
-	splash.init(md3dDevice,1.0f,BLACK);
+	
+	splash.init(md3dDevice,50.0f,WHITE);
 
 	float roadZLength = 100.0f;
 
@@ -285,6 +285,7 @@ void ColoredCubeApp::updateScene(float dt)
 {
 	if(gameStates == gameMenu)
 	{
+		splash.setPosition(playerKart.getPosition());
 		if(GetAsyncKeyState(VK_RETURN) & 0x8000){
 			gameStates = gamePlay;
 		}
@@ -416,8 +417,10 @@ void ColoredCubeApp::updateScene(float dt)
 	}
 	else if(gameStates == endGame){
 		splash.setPosition(playerKart.getPosition());
+		camera.update(dt,Vector3(0,0,0));
+		splash.setRotYAngle(ToRadian(90));
 		if(GetAsyncKeyState(VK_RETURN) & 0x8000){
-			gameStates = gameMenu;
+			gameStates = gamePlay;
 	//mCarMesh.init(md3dDevice, 1.0f);
 
 	mParallelLight.dir      = D3DXVECTOR3(0.57735f, -0.57735f, 0.57735f);
@@ -453,7 +456,8 @@ void ColoredCubeApp::updateScene(float dt)
 
 	D3DXCOLOR colors [ROADS] = {YELLOW, GREEN, BLUE};
 
-	splash.init(md3dDevice,1.0f,BLACK);
+	
+	splash.init(md3dDevice,50.0f,WHITE);
 
 	float roadZLength = 100.0f;
 
@@ -589,7 +593,7 @@ void ColoredCubeApp::drawScene()
 
 			mfxEyePosVar->SetRawValue(cameraPos, 0, sizeof(D3DXVECTOR3));
 			mfxLightVar->SetRawValue(&mLight, 0, sizeof(Light));
-			mfxLightType->SetInt(0);
+			//mfxLightType->SetInt(0);
 
 
 			D3D10_TECHNIQUE_DESC techDesc;
@@ -664,37 +668,48 @@ void ColoredCubeApp::drawScene()
 
 		}
 		else if (gameStates==gameMenu) {
-			mfxLightVar->SetRawValue(&mParallelLight, 0, sizeof(Light));
+		std::wstring playerPositionText, gameOverText;
 
-			mfxDiffuseMapVar->SetResource(splashTex);
-			mfxSpecMapVar->SetResource(mSpecMapRV);
-			mWVP = playerKart.getWorldMatrix()*mView*mProj;
-			mfxWVPVar->SetMatrix((float*)&mWVP);
-			playerKart.setMTech(mTech);
-			splash.draw();
+			std::wostringstream outs;   
+			outs.precision(6);
+			outs << "Geo Racers\n\n\nPress <enter> to begin!";
+			playerPositionText = outs.str();
+			RECT playerPos = {100, 100, mClientWidth, mClientHeight};
+			mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
+
 
 		}
 		else if (gameStates==endGame) {
-			D3DXMATRIX texMtx;
-			D3DXMatrixIdentity(&texMtx);
-			mfxTexMtxVar->SetMatrix((float*)&texMtx);
+
+			std::wstring playerPositionText, gameOverText;
+
+			std::wostringstream outs;   
+			outs.precision(6);
+			outs << "FINISH!\n\n\nPress <enter> to continue!";
+			playerPositionText = outs.str();
+			RECT playerPos = {100, 100, mClientWidth, mClientHeight};
+			mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
+
+		//	D3DXMATRIX texMtx;
+		//	D3DXMatrixIdentity(&texMtx);
+		//	mfxTexMtxVar->SetMatrix((float*)&texMtx);
 
 
-			mfxEyePosVar->SetRawValue(cameraPos, 0, sizeof(D3DXVECTOR3));
-			mfxLightVar->SetRawValue(&mLight, 0, sizeof(Light));
-			mfxLightType->SetInt(0);
+		//	mfxEyePosVar->SetRawValue(cameraPos, 0, sizeof(D3DXVECTOR3));
+		//	mfxLightVar->SetRawValue(&mLight, 0, sizeof(Light));
+		////	mfxLightType->SetInt(0);
 
 
-			D3D10_TECHNIQUE_DESC techDesc;
-			mTech->GetDesc(&techDesc);
-			mfxLightVar->SetRawValue(&mParallelLight, 0, sizeof(Light));
-			mWVP = playerKart.getWorldMatrix()*mView*mProj;
-			mfxWVPVar->SetMatrix((float*)&mWVP);
-			playerKart.setMTech(mTech);
-			mfxDiffuseMapVar->SetResource(splashTex);
-			mfxSpecMapVar->SetResource(mSpecMapRV);
-
-			splash.draw();
+		//	D3D10_TECHNIQUE_DESC techDesc;
+		//	mTech->GetDesc(&techDesc);
+		//	mfxLightVar->SetRawValue(&mParallelLight, 0, sizeof(Light));
+		//	mWVP = playerKart.getWorldMatrix()*mView*mProj;
+		//	mfxWVPVar->SetMatrix((float*)&mWVP);
+		//	playerKart.setMTech(mTech);
+		//	mfxDiffuseMapVar->SetResource(splashTex);
+		//	mfxSpecMapVar->SetResource(mSpecMapRV);
+		//	playerKart.draw();
+		//	splash.draw();
 
 		}
 
@@ -733,7 +748,7 @@ void ColoredCubeApp::buildFX()
 	mfxSpecMapVar    = mFX->GetVariableByName("gSpecMap")->AsShaderResource();
 	mfxTexMtxVar     = mFX->GetVariableByName("gTexMtx")->AsMatrix();
 
-	mfxWVPVar = mFX->GetVariableByName("gWVP")->AsMatrix();
+	/*mfxWVPVar = mFX->GetVariableByName("gWVP")->AsMatrix();
 	hr = D3DX10CreateEffectFromFile(L"../Games_2_GeoRacers/lighting.fx", 0, 0, 
 		"fx_4_0", shaderFlags, 0, md3dDevice, 0, 0, &mFX, &compilationErrors, 0);
 	if(FAILED(hr))
@@ -752,7 +767,7 @@ void ColoredCubeApp::buildFX()
 	mfxWorldVar  = mFX->GetVariableByName("gWorld")->AsMatrix();
 	mfxEyePosVar = mFX->GetVariableByName("gEyePosW");
 	mfxLightVar  = mFX->GetVariableByName("gLight");
-	mfxLightType = mFX->GetVariableByName("gLightType")->AsScalar();
+	mfxLightType = mFX->GetVariableByName("gLightType")->AsScalar();*/
 
 }
 
@@ -760,19 +775,33 @@ void ColoredCubeApp::buildFX()
 void ColoredCubeApp::buildVertexLayouts()
 {
 	// Create the vertex input layout.
+//	D3D10_INPUT_ELEMENT_DESC vertexDesc[] =
+//	{
+//		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+//		//{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
+//		{"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
+//		{"DIFFUSE",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
+//		{"SPECULAR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 40, D3D10_INPUT_PER_VERTEX_DATA, 0}
+//	};
+//
+//	// Create the input layout
+//	D3D10_PASS_DESC PassDesc;
+//	mTech->GetPassByIndex(0)->GetDesc(&PassDesc);
+//	HR(md3dDevice->CreateInputLayout(vertexDesc, 3, PassDesc.pIAInputSignature,
+	//		PassDesc.IAInputSignatureSize, &mVertexLayout));
+//}
 	D3D10_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-		//{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
 		{"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
-		{"DIFFUSE",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
-		{"SPECULAR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 40, D3D10_INPUT_PER_VERTEX_DATA, 0}
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
 	};
 
 	// Create the input layout
-	D3D10_PASS_DESC PassDesc;
-	mTech->GetPassByIndex(0)->GetDesc(&PassDesc);
-	HR(md3dDevice->CreateInputLayout(vertexDesc, 4, PassDesc.pIAInputSignature,
+    D3D10_PASS_DESC PassDesc;
+    mTech->GetPassByIndex(0)->GetDesc(&PassDesc);
+    HR(md3dDevice->CreateInputLayout(vertexDesc, 3, PassDesc.pIAInputSignature,
 		PassDesc.IAInputSignatureSize, &mVertexLayout));
 }
+
 
