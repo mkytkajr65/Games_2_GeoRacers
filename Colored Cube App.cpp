@@ -284,9 +284,15 @@ void ColoredCubeApp::updateScene(float dt)
 
 		float velX, velY, velZ;
 
-		velX = playerKart.getVelocity().x;
-		velY = 0.0;
-		velZ = playerKart.getVelocity().z;
+	velX = playerKart.getVelocity().x;
+	for(int i = 0; i < ROADS; i++) {
+		if(playerKart.getPosition().x <= road[i].getPosition().x -10 && velX < 0)
+			velX = -velX/2;
+		if(playerKart.getPosition().x >= road[i].getPosition().x + 10 && velX > 0)
+			velX = -velX/2;
+	}
+	velY = 0.0;
+	velZ = playerKart.getVelocity().z;
 
 		//ADD UPDATES HERE
 		Vector3 direction = Vector3(0,0,0);
