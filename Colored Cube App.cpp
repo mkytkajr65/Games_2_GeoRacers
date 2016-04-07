@@ -443,7 +443,7 @@ for(int i = 0;i<OBSTACLES;i++)
 		mLight3.pos = D3DXVECTOR3(playerKart.getPosition().x + .75, playerKart.getPosition().y, playerKart.getPosition().z);*/
 
 		GameObject* places = place.getKartsPlaces(allKarts, CPU_KARTS+1);
-		//playerPosition = place.getPlayerPosition(places, CPU_KARTS+1);
+		playerPosition = place.getPlayerPosition(places, CPU_KARTS+1);
 
 		for(int i = 0;i<CPU_KARTS+1;i++){
 			if(allKarts[i].getPosition().z + 4.0f >= (ROADS * ROAD_LENGTH)){
