@@ -411,7 +411,7 @@ for(int i = 0;i<OBSTACLES;i++)
                            playerKart.setAlreadyCollided(false);
               }
        }
-for (int j = 0; j < CPU_KARTS; j++) {
+	for (int j = 0; j < CPU_KARTS; j++) {
               for(int i = 0;i<OBSTACLES;i++)
               {
                      if(CPUKarts[j].collided(&obstacles[i]) && !CPUKarts[j].getAlreadyCollided())
