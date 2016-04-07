@@ -22,6 +22,7 @@
 #include "Road.h"
 #include "KartPlace.h"
 #include "Light.h"
+#include "audio.h"
 
 
 class ColoredCubeApp : public D3DApp
@@ -65,6 +66,10 @@ private:
 
 	Road road[ROADS];
 	LineObject xLine, yLine, zLine;
+	Light mLight;
+	Audio *audio;
+	/*Light mLight2;
+	Light mLight3;*/
 
 	float spinAmount;
 
@@ -72,6 +77,11 @@ private:
 	ID3D10EffectTechnique* mTech;
 	ID3D10InputLayout* mVertexLayout;
 	ID3D10EffectMatrixVariable* mfxWVPVar;
+	ID3D10EffectMatrixVariable* mfxWorldVar;
+	ID3D10EffectVariable* mfxEyePosVar;
+	ID3D10EffectVariable* mfxLightVar;
+	ID3D10EffectScalarVariable* mfxLightType;
+
 
 	ID3D10EffectMatrixVariable* mfxWorldVar;
 	ID3D10EffectVariable* mfxEyePosVar;
@@ -86,7 +96,7 @@ private:
 	D3DXMATRIX mView;
 	D3DXMATRIX mProj;
 	D3DXMATRIX mWVP;
-
+	float soundTimer;
 	float mTheta;
 	float mPhi;
 };
@@ -153,7 +163,7 @@ void ColoredCubeApp::initApp()
 		L"../Games_2_GeoRacers/stripe.png", 0, 0, &carTexVar, 0 ));
 
 	spinAmount = 0;
-
+	soundTimer = 0;
 	pKart.init(md3dDevice, 1, CHARCOAL_GREY);
 	cKart.init(md3dDevice, 1, RED);
 	obstacle.init(md3dDevice, 1, WHITE);
@@ -192,7 +202,7 @@ void ColoredCubeApp::initApp()
 	int maxVelocity = 10.0;
 
 	for(int i = 0; i < CPU_KARTS; i++) {
-		randVelocity  = rand() % maxVelocity;
+		randVelocity  = rand() % maxVelocity + 1;
 		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(0,0,randVelocity),0,1);
 		if (i==0) {
 			CPUKarts[i].setPosition(Vector3(playerKart.getPosition().x + 1.5, 0,playerKart.getPosition().z + 2));
@@ -203,10 +213,42 @@ void ColoredCubeApp::initApp()
 	}
 
 	//CAMERA initialization here
+	mLight.dir      = D3DXVECTOR3(0.0f, -0.707f, -0.707f);
+	mLight.ambient  = D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f);
+	mLight.diffuse  = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+	mLight.specular = D3DXCOLOR(1.0f, 1.0f, 0.0f, 0.0f);
+
+	/*mLight2.ambient  = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+	mLight2.diffuse  = D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f);
+	mLight2.specular = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+	mLight2.att.x    = 0.0f;
+	mLight2.att.y    = 0.0f;
+	mLight2.att.z    = 1.0f;
+	mLight2.spotPow  = 64.0f;
+	mLight2.range    = 10000.0f;
+	mLight2.pos = D3DXVECTOR3(playerKart.getPosition().x + .25, playerKart.getPosition().y, playerKart.getPosition().z);
+
+	mLight3.ambient  = D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f);
+	mLight3.diffuse  = D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f);
+	mLight3.specular = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+	mLight3.att.x    = 0.0f;
+	mLight3.att.y    = 0.0f;
+	mLight3.att.z    = 1.0f;
+	mLight3.spotPow  = 64.0f;
+	mLight3.range    = 10000.0f;
+	mLight3.pos = D3DXVECTOR3(playerKart.getPosition().x + .75, playerKart.getPosition().y, playerKart.getPosition().z);*/
 
 	//camera.init(Vector3(playerKart.getPosition().x + 10,playerKart.getPosition().y + 2,playerKart.getPosition().z), Vector3(0,0,0), Vector3(-1,.2,0));
 	camera.init(Vector3(0,2,-10), Vector3(0,0,0), Vector3(0,0,10), &playerKart);
 	camera.setPerspective();
+
+	audio = new Audio();
+    if (*WAVE_BANK != '\0' && *SOUND_BANK != '\0')  // if sound files defined
+    {
+		if (!audio->initialize()){
+			
+		}
+	}
 
 	line.init(md3dDevice, 1.0f, WHITE);
 	xLine.init(&line, Vector3(0,0,0), 5);
@@ -217,6 +259,8 @@ void ColoredCubeApp::initApp()
 	zLine.init(&line, Vector3(0,0,0), 5);
 	zLine.setPosition(Vector3(0,0,0));
 	zLine.setRotationY(ToRadian(270));
+
+	audio->playCue(CIRCUIT);
 }
 
 void ColoredCubeApp::onResize()
@@ -252,12 +296,20 @@ void ColoredCubeApp::updateScene(float dt)
 	}
 	if(GetAsyncKeyState('S') & 0x8000){
 			direction.z = -1;
+	if(soundTimer >= 2) {
+		soundTimer = 0;
+		audio->stopCue(REV);
+	}
 			velZ = velZ - PLAYER_ACCELERATION;
 	}
 	if(GetAsyncKeyState('W') & 0x8000){
 			direction.z = 1;
 			velZ = velZ + PLAYER_ACCELERATION;
+			soundTimer += dt;
+			if(soundTimer >= 1)
+				audio->playCue(REV);
 	}
+	
 
 	
 
@@ -305,7 +357,9 @@ void ColoredCubeApp::updateScene(float dt)
 		{
 			playerKart.setAlreadyCollided(true);
 			playerKart.setVelocity(Vector3(0,0,0));
-		}else if(!playerKart.collided(&obstacles[i]) && !playerKart.getAlreadyCollided()){
+			audio->playCue(SQUEAL);
+		}
+		else if(!playerKart.collided(&obstacles[i]) && !playerKart.getAlreadyCollided()){
 			playerKart.setAlreadyCollided(false);
 		}
 	}
@@ -332,6 +386,8 @@ void ColoredCubeApp::updateScene(float dt)
 	}
 
 	allKarts[CPU_KARTS] = playerKart;
+	/*mLight2.pos = D3DXVECTOR3(playerKart.getPosition().x + .25, playerKart.getPosition().y, playerKart.getPosition().z);
+	mLight3.pos = D3DXVECTOR3(playerKart.getPosition().x + .75, playerKart.getPosition().y, playerKart.getPosition().z);*/
 
 	GameObject* places = place.getKartsPlaces(allKarts, CPU_KARTS+1);
 
@@ -344,7 +400,6 @@ void ColoredCubeApp::drawScene()
 
 
 	mfxLightVar->SetRawValue(&mParallelLight, 0, sizeof(Light));
-
 
 	mfxDiffuseMapVar->SetResource(mDiffuseMapRV);
 	mfxSpecMapVar->SetResource(mSpecMapRV);
@@ -377,6 +432,12 @@ void ColoredCubeApp::drawScene()
 	D3DXMatrixIdentity(&texMtx);
 	mfxTexMtxVar->SetMatrix((float*)&texMtx);
 	
+
+	mfxEyePosVar->SetRawValue(cameraPos, 0, sizeof(D3DXVECTOR3));
+	mfxLightVar->SetRawValue(&mLight, 0, sizeof(Light));
+	mfxLightType->SetInt(0);
+
+
 	D3D10_TECHNIQUE_DESC techDesc;
 	mTech->GetDesc(&techDesc);
 
@@ -458,6 +519,28 @@ void ColoredCubeApp::buildFX()
 	mfxDiffuseMapVar = mFX->GetVariableByName("gDiffuseMap")->AsShaderResource();
 	mfxSpecMapVar    = mFX->GetVariableByName("gSpecMap")->AsShaderResource();
 	mfxTexMtxVar     = mFX->GetVariableByName("gTexMtx")->AsMatrix();
+
+	mfxWVPVar = mFX->GetVariableByName("gWVP")->AsMatrix();
+	hr = D3DX10CreateEffectFromFile(L"../Games_2_GeoRacers/lighting.fx", 0, 0, 
+		"fx_4_0", shaderFlags, 0, md3dDevice, 0, 0, &mFX, &compilationErrors, 0);
+	if(FAILED(hr))
+	{
+		if( compilationErrors )
+		{
+			MessageBoxA(0, (char*)compilationErrors->GetBufferPointer(), 0, 0);
+			ReleaseCOM(compilationErrors);
+		}
+		DXTrace(__FILE__, (DWORD)__LINE__, hr, L"D3DX10CreateEffectFromFile", true);
+	} 
+
+	mTech = mFX->GetTechniqueByName("LightTech");
+	
+	mfxWVPVar    = mFX->GetVariableByName("gWVP")->AsMatrix();
+	mfxWorldVar  = mFX->GetVariableByName("gWorld")->AsMatrix();
+	mfxEyePosVar = mFX->GetVariableByName("gEyePosW");
+	mfxLightVar  = mFX->GetVariableByName("gLight");
+	mfxLightType = mFX->GetVariableByName("gLightType")->AsScalar();
+
 }
 
 
@@ -466,16 +549,19 @@ void ColoredCubeApp::buildVertexLayouts()
 	// Create the vertex input layout.
 	D3D10_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+
+		//{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
 		{"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
+		{"DIFFUSE",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
+		{"SPECULAR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 40, D3D10_INPUT_PER_VERTEX_DATA, 0}
+
 	};
 
 	// Create the input layout
     D3D10_PASS_DESC PassDesc;
     mTech->GetPassByIndex(0)->GetDesc(&PassDesc);
-    HR(md3dDevice->CreateInputLayout(vertexDesc, 3, PassDesc.pIAInputSignature,
-		PassDesc.IAInputSignatureSize, &mVertexLayout));
+
+    HR(md3dDevice->CreateInputLayout(vertexDesc, 4, PassDesc.pIAInputSignature,PassDesc.IAInputSignatureSize, &mVertexLayout));
 }
 
  
