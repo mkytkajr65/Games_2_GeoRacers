@@ -25,14 +25,14 @@ void Box::init(ID3D10Device* device, float scale, D3DXCOLOR c)
 	// Create vertex buffer
     Vertex vertices[] =
     {
-		{D3DXVECTOR3(-0.5f, -.5f, -2.0f), c},
-		{D3DXVECTOR3(-0.5f, +.5f, -2.0f), c},
-		{D3DXVECTOR3(+0.5f, +.5f, -2.0f), c},
-		{D3DXVECTOR3(+0.5f, -.5f, -2.0f), c},
-		{D3DXVECTOR3(-0.5f, -.5f, +2.0f), c},
-		{D3DXVECTOR3(-0.5f, +.5f, +2.0f), c},
-		{D3DXVECTOR3(+0.5f, +.5f, +2.0f), c},
-		{D3DXVECTOR3(+0.5f, -.5f, +2.0f), c},
+		{D3DXVECTOR3(-0.5f, -.5f, -2.0f), D3DXVECTOR3(-.577f, -.577f, -.577f), c, WHITE},
+		{D3DXVECTOR3(-0.5f, +.5f, -2.0f), D3DXVECTOR3(-.577f, .577f, -.577f), c, WHITE},
+		{D3DXVECTOR3(+0.5f, +.5f, -2.0f), D3DXVECTOR3(.577f, .577f, -.577f), c, WHITE},
+		{D3DXVECTOR3(+0.5f, -.5f, -2.0f), D3DXVECTOR3(.577f, -.577f, -.577f), c, WHITE},
+		{D3DXVECTOR3(-0.5f, -.5f, +2.0f), D3DXVECTOR3(-.577f, -.577f, .577f), c, WHITE},
+		{D3DXVECTOR3(-0.5f, +.5f, +2.0f), D3DXVECTOR3(-.577f, .577f, .577f), c, WHITE},
+		{D3DXVECTOR3(+0.5f, +.5f, +2.0f), D3DXVECTOR3(.577f, .577f, .577f), c, WHITE},
+		{D3DXVECTOR3(+0.5f, -.5f, +2.0f), D3DXVECTOR3(.577f, -.577f, .577f), c, WHITE}
     };
 
 
