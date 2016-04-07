@@ -41,9 +41,9 @@ private:
 	void buildVertexLayouts();
 
 	//Audio *audio;
- 
+
 private:
-// Camera stuff
+	// Camera stuff
 	Vector3 cameraPos;
 	Vector3 lookAt;
 	Camera camera;
@@ -85,7 +85,7 @@ private:
 	ID3D10EffectMatrixVariable* mfxWorldVar;
 	ID3D10EffectShaderResourceVariable* mfxDiffuseMapVar;
 	ID3D10EffectShaderResourceVariable* mfxSpecMapVar;
-	
+
 	ID3D10EffectMatrixVariable* mfxTexMtxVar;
 
 	Box mCarMesh;
@@ -108,16 +108,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 
 
 	ColoredCubeApp theApp(hInstance);
-	
+
 	theApp.initApp();
 
 	return theApp.run();
 }
 
 ColoredCubeApp::ColoredCubeApp(HINSTANCE hInstance)
-: D3DApp(hInstance), mFX(0), mTech(0), mfxWVPVar(0), mfxWorldVar(0), mfxEyePosVar(0),
-  mfxLightVar(0), mfxDiffuseMapVar(0), mfxSpecMapVar(0), mfxTexMtxVar(0), 
-  mVertexLayout(0), mDiffuseMapRV(0), mSpecMapRV(0), mTheta(0.0f), mPhi(PI*0.25f)
+	: D3DApp(hInstance), mFX(0), mTech(0), mfxWVPVar(0), mfxWorldVar(0), mfxEyePosVar(0),
+	mfxLightVar(0), mfxDiffuseMapVar(0), mfxSpecMapVar(0), mfxTexMtxVar(0), 
+	mVertexLayout(0), mDiffuseMapRV(0), mSpecMapRV(0), mTheta(0.0f), mPhi(PI*0.25f)
 {
 	D3DXMatrixIdentity(&mView);
 	D3DXMatrixIdentity(&mProj);
@@ -140,7 +140,7 @@ void ColoredCubeApp::initApp()
 	buildFX();
 	buildVertexLayouts();
 
-	
+
 	gameStates = gameMenu;
 	//mCarMesh.init(md3dDevice, 1.0f);
 
@@ -151,7 +151,6 @@ void ColoredCubeApp::initApp()
 
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
 		L"../Games_2_GeoRacers/test.png", 0, 0, &mDiffuseMapRV, 0 ));
-
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
 		L"../Games_2_GeoRacers/defaultspec.dds", 0, 0, &mSpecMapRV, 0 ));
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
@@ -240,10 +239,10 @@ void ColoredCubeApp::initApp()
 	camera.setPerspective();
 
 	audio = new Audio();
-    if (*WAVE_BANK != '\0' && *SOUND_BANK != '\0')  // if sound files defined
-    {
+	if (*WAVE_BANK != '\0' && *SOUND_BANK != '\0')  // if sound files defined
+	{
 		if (!audio->initialize()){
-			
+
 		}
 	}
 
@@ -270,125 +269,136 @@ void ColoredCubeApp::onResize()
 
 void ColoredCubeApp::updateScene(float dt)
 {
-	D3DApp::updateScene(dt);
-	xLine.update(dt);
-	yLine.update(dt);
-	zLine.update(dt);
+	if(gameStates == gameMenu)
+	{
+		if(GetAsyncKeyState(VK_RETURN) & 0x8000){
+			gameStates = gamePlay;
+		}
+	}
+	else if(gameStates == gamePlay)
+	{
+		D3DApp::updateScene(dt);
+		xLine.update(dt);
+		yLine.update(dt);
+		zLine.update(dt);
 
-	float velX, velY, velZ;
+		float velX, velY, velZ;
 
-	velX = playerKart.getVelocity().x;
-	velY = 0.0;
-	velZ = playerKart.getVelocity().z;
+		velX = playerKart.getVelocity().x;
+		velY = 0.0;
+		velZ = playerKart.getVelocity().z;
 
-	//ADD UPDATES HERE
-	Vector3 direction = Vector3(0,0,0);
-	if(GetAsyncKeyState('A') & 0x8000){
+		//ADD UPDATES HERE
+		Vector3 direction = Vector3(0,0,0);
+		if(GetAsyncKeyState('A') & 0x8000){
 			direction.x = -1;
 			velX = velX - PLAYER_ACCELERATION;
-	}
-	if(GetAsyncKeyState('D') & 0x8000){
+		}
+		if(GetAsyncKeyState('D') & 0x8000){
 			direction.x = 1;
 			velX = velX + PLAYER_ACCELERATION;
-	}
-	if(GetAsyncKeyState('S') & 0x8000){
+		}
+		if(GetAsyncKeyState('S') & 0x8000){
 			direction.z = -1;
-	if(soundTimer >= 2) {
-		soundTimer = 0;
-		audio->stopCue(REV);
-	}
+			if(soundTimer >= 2) {
+				soundTimer = 0;
+				audio->stopCue(REV);
+			}
 			velZ = velZ - PLAYER_ACCELERATION;
-	}
-	if(GetAsyncKeyState('W') & 0x8000){
+		}
+		if(GetAsyncKeyState('W') & 0x8000){
 			direction.z = 1;
 			velZ = velZ + PLAYER_ACCELERATION;
 			soundTimer += dt;
 			if(soundTimer >= 1)
 				audio->playCue(REV);
-	}
-	
+		}
 
-	
+		if(velX > PLAYER_MAX_VELOCITY){
+			velX = PLAYER_MAX_VELOCITY ;
+		}else if(velX < -PLAYER_MAX_VELOCITY){
+			velX = -PLAYER_MAX_VELOCITY ;
+		}
 
-	if(velX > PLAYER_MAX_VELOCITY){
-		velX = PLAYER_MAX_VELOCITY ;
-	}else if(velX < -PLAYER_MAX_VELOCITY){
-		velX = -PLAYER_MAX_VELOCITY ;
-	}
-
-	if(velZ > PLAYER_MAX_VELOCITY){
-		velZ = PLAYER_MAX_VELOCITY ;
-	}else if(velZ < -PLAYER_MAX_VELOCITY){
-		velZ = -PLAYER_MAX_VELOCITY ;
-	}
+		if(velZ > PLAYER_MAX_VELOCITY){
+			velZ = PLAYER_MAX_VELOCITY ;
+		}else if(velZ < -PLAYER_MAX_VELOCITY){
+			velZ = -PLAYER_MAX_VELOCITY ;
+		}
 
 
 
-	_RPT1(0,"Velocity X %f ", velX);
-	_RPT1(0,"Velocity Z %f ", velZ);
+		_RPT1(0,"Velocity X %f ", velX);
+		_RPT1(0,"Velocity Z %f ", velZ);
 
-	D3DXVec3Normalize(&direction, &direction);
+		D3DXVec3Normalize(&direction, &direction);
 
-	Vector3 playerVelocity = Vector3(velX, velY, velZ);
+		Vector3 playerVelocity = Vector3(velX, velY, velZ);
 
-	playerKart.setVelocity(playerVelocity);
+		playerKart.setVelocity(playerVelocity);
 
-	camera.update(dt, playerVelocity);
+		camera.update(dt, playerVelocity);
 
-	playerKart.update(dt);
-	for (int i = 0; i < CPU_KARTS; i++) {
-		CPUKarts[i].update(dt);
-	}
+		playerKart.update(dt);
+		for (int i = 0; i < CPU_KARTS; i++) {
+			CPUKarts[i].update(dt);
+		}
 
-	for (int i = 0; i < OBSTACLES; i++) {
-		obstacles[i].update(dt);
-	}
-	for(int i = 0;i<ROADS;i++)
-	{
-		road[i].update(dt);
-	}
-
-	for(int i = 0;i<OBSTACLES;i++)
-	{
-		if(playerKart.collided(&obstacles[i]) && !playerKart.getAlreadyCollided())
+		for (int i = 0; i < OBSTACLES; i++) {
+			obstacles[i].update(dt);
+		}
+		for(int i = 0;i<ROADS;i++)
 		{
-			playerKart.setAlreadyCollided(true);
-			playerKart.setVelocity(Vector3(0,0,0));
-			audio->playCue(SQUEAL);
+			road[i].update(dt);
 		}
-		else if(!playerKart.collided(&obstacles[i]) && !playerKart.getAlreadyCollided()){
-			playerKart.setAlreadyCollided(false);
-		}
-	}
 
-	for(int j = 0;j<CPU_KARTS;j++)
-	{
 		for(int i = 0;i<OBSTACLES;i++)
 		{
-			if(CPUKarts[j].collided(&obstacles[i]) && !CPUKarts[j].getAlreadyCollided())
+			if(playerKart.collided(&obstacles[i]) && !playerKart.getAlreadyCollided())
 			{
-				CPUKarts[j].setAlreadyCollided(true);
-				CPUKarts[j].setVelocity(Vector3(0,0,0));
-			}else if(!CPUKarts[j].collided(&obstacles[i]) && !CPUKarts[j].getAlreadyCollided()){
-				CPUKarts[j].setAlreadyCollided(false);
+				playerKart.setAlreadyCollided(true);
+				playerKart.setVelocity(Vector3(0,0,0));
+				audio->playCue(SQUEAL);
+			}
+			else if(!playerKart.collided(&obstacles[i]) && !playerKart.getAlreadyCollided()){
+				playerKart.setAlreadyCollided(false);
 			}
 		}
+
+		for(int j = 0;j<CPU_KARTS;j++)
+		{
+			for(int i = 0;i<OBSTACLES;i++)
+			{
+				if(CPUKarts[j].collided(&obstacles[i]) && !CPUKarts[j].getAlreadyCollided())
+				{
+					CPUKarts[j].setAlreadyCollided(true);
+					CPUKarts[j].setVelocity(Vector3(0,0,0));
+				}else if(!CPUKarts[j].collided(&obstacles[i]) && !CPUKarts[j].getAlreadyCollided()){
+					CPUKarts[j].setAlreadyCollided(false);
+				}
+			}
+		}
+		KartPlace place;
+		GameObject allKarts[CPU_KARTS+1];
+
+		for(int i = 0;i<CPU_KARTS;i++)
+		{
+			allKarts[i] = CPUKarts[i];
+		}
+
+		allKarts[CPU_KARTS] = playerKart;
+		/*mLight2.pos = D3DXVECTOR3(playerKart.getPosition().x + .25, playerKart.getPosition().y, playerKart.getPosition().z);
+		mLight3.pos = D3DXVECTOR3(playerKart.getPosition().x + .75, playerKart.getPosition().y, playerKart.getPosition().z);*/
+
+		GameObject* places = place.getKartsPlaces(allKarts, CPU_KARTS+1);
+
+		//place.printTopThree(places, CPU_KARTS+1);
 	}
-	KartPlace place;
-	GameObject allKarts[CPU_KARTS+1];
-
-	for(int i = 0;i<CPU_KARTS;i++)
-	{
-		allKarts[i] = CPUKarts[i];
+	else if(gameStates == endGame){
+		if(GetAsyncKeyState(VK_RETURN) & 0x8000){
+			gameStates = gamePlay;
+		}
 	}
-
-	allKarts[CPU_KARTS] = playerKart;
-	/*mLight2.pos = D3DXVECTOR3(playerKart.getPosition().x + .25, playerKart.getPosition().y, playerKart.getPosition().z);
-	mLight3.pos = D3DXVECTOR3(playerKart.getPosition().x + .75, playerKart.getPosition().y, playerKart.getPosition().z);*/
-
-	GameObject* places = place.getKartsPlaces(allKarts, CPU_KARTS+1);
-
-	//place.printTopThree(places, CPU_KARTS+1);
 }
 
 void ColoredCubeApp::drawScene()
@@ -400,17 +410,17 @@ void ColoredCubeApp::drawScene()
 
 	mfxDiffuseMapVar->SetResource(mDiffuseMapRV);
 	mfxSpecMapVar->SetResource(mSpecMapRV);
-	
+
 	md3dDevice->OMSetDepthStencilState(0, 0);
 	float blendFactors[] = {0.0f, 0.0f, 0.0f, 0.0f};
 	md3dDevice->OMSetBlendState(0, blendFactors, 0xffffffff);
-    md3dDevice->IASetInputLayout(mVertexLayout);
+	md3dDevice->IASetInputLayout(mVertexLayout);
 
 	//Camera view and projection matrices
-	 mView = camera.getViewMatrix();
-	 mProj = camera.getProjectionMatrix();
+	mView = camera.getViewMatrix();
+	mProj = camera.getProjectionMatrix();
 
-	 mWVP = xLine.getWorldMatrix()*mView*mProj;
+	mWVP = xLine.getWorldMatrix()*mView*mProj;
 	mfxWVPVar->SetMatrix((float*)&mWVP);
 	xLine.setMTech(mTech);
 	xLine.draw();
@@ -428,7 +438,7 @@ void ColoredCubeApp::drawScene()
 	D3DXMATRIX texMtx;
 	D3DXMatrixIdentity(&texMtx);
 	mfxTexMtxVar->SetMatrix((float*)&texMtx);
-	
+
 
 	mfxEyePosVar->SetRawValue(cameraPos, 0, sizeof(D3DXVECTOR3));
 	mfxLightVar->SetRawValue(&mLight, 0, sizeof(Light));
@@ -443,17 +453,18 @@ void ColoredCubeApp::drawScene()
 		mWVP = road[i].getWorld()*mView*mProj;
 		mfxWVPVar->SetMatrix((float*)&mWVP);
 		mTech->GetDesc( &techDesc );
-		
+
 		for(UINT p = 0; p < techDesc.Passes; ++p)
 		{
 			mTech->GetPassByIndex( p )->Apply(0);
 			road[i].draw();
 		}
 	}
-	
+
 
 	mfxDiffuseMapVar->SetResource(carTexVar);
 	mfxSpecMapVar->SetResource(mSpecMapRV);
+
 	for(int i = 0; i < CPU_KARTS; i++)
 	{
 		mWVP = CPUKarts[i].getWorldMatrix()*mView*mProj;
@@ -461,7 +472,7 @@ void ColoredCubeApp::drawScene()
 		CPUKarts[i].setMTech(mTech);
 		CPUKarts[i].draw();
 	}
-		mfxDiffuseMapVar->SetResource(boxTexVar);
+	mfxDiffuseMapVar->SetResource(boxTexVar);
 	mfxSpecMapVar->SetResource(mSpecMapRV);
 
 	for(int i = 0; i < OBSTACLES; i++)
@@ -473,7 +484,7 @@ void ColoredCubeApp::drawScene()
 	}
 	mfxDiffuseMapVar->SetResource(carTexVar);
 	mfxSpecMapVar->SetResource(mSpecMapRV);
-	 mWVP = playerKart.getWorldMatrix()*mView*mProj;
+	mWVP = playerKart.getWorldMatrix()*mView*mProj;
 	mfxWVPVar->SetMatrix((float*)&mWVP);
 	playerKart.setMTech(mTech);
 	playerKart.draw();
@@ -489,10 +500,10 @@ void ColoredCubeApp::buildFX()
 {
 	DWORD shaderFlags = D3D10_SHADER_ENABLE_STRICTNESS;
 #if defined( DEBUG ) || defined( _DEBUG )
-    shaderFlags |= D3D10_SHADER_DEBUG;
+	shaderFlags |= D3D10_SHADER_DEBUG;
 	shaderFlags |= D3D10_SHADER_SKIP_OPTIMIZATION;
 #endif
- 
+
 	ID3D10Blob* compilationErrors = 0;
 	HRESULT hr = 0;
 	hr = D3DX10CreateEffectFromFile(L"../Games_2_GeoRacers/tex.fx", 0, 0, 
@@ -508,7 +519,7 @@ void ColoredCubeApp::buildFX()
 	} 
 
 	mTech = mFX->GetTechniqueByName("TexTech");
-	
+
 	mfxWVPVar        = mFX->GetVariableByName("gWVP")->AsMatrix();
 	mfxWorldVar      = mFX->GetVariableByName("gWorld")->AsMatrix();
 	mfxEyePosVar     = mFX->GetVariableByName("gEyePosW");
@@ -531,7 +542,7 @@ void ColoredCubeApp::buildFX()
 	} 
 
 	mTech = mFX->GetTechniqueByName("LightTech");
-	
+
 	mfxWVPVar    = mFX->GetVariableByName("gWVP")->AsMatrix();
 	mfxWorldVar  = mFX->GetVariableByName("gWorld")->AsMatrix();
 	mfxEyePosVar = mFX->GetVariableByName("gEyePosW");
@@ -543,21 +554,20 @@ void ColoredCubeApp::buildFX()
 
 void ColoredCubeApp::buildVertexLayouts()
 {
-       // Create the vertex input layout.
-       D3D10_INPUT_ELEMENT_DESC vertexDesc[] =
-       {
-              {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-              //{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
-              {"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
-              {"DIFFUSE",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
-              {"SPECULAR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 40, D3D10_INPUT_PER_VERTEX_DATA, 0}
-       };
+	// Create the vertex input layout.
+	D3D10_INPUT_ELEMENT_DESC vertexDesc[] =
+	{
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
+		//{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
+		{"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
+		{"DIFFUSE",  0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
+		{"SPECULAR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 40, D3D10_INPUT_PER_VERTEX_DATA, 0}
+	};
 
-       // Create the input layout
-    D3D10_PASS_DESC PassDesc;
-    mTech->GetPassByIndex(0)->GetDesc(&PassDesc);
-    HR(md3dDevice->CreateInputLayout(vertexDesc, 4, PassDesc.pIAInputSignature,
-              PassDesc.IAInputSignatureSize, &mVertexLayout));
+	// Create the input layout
+	D3D10_PASS_DESC PassDesc;
+	mTech->GetPassByIndex(0)->GetDesc(&PassDesc);
+	HR(md3dDevice->CreateInputLayout(vertexDesc, 4, PassDesc.pIAInputSignature,
+		PassDesc.IAInputSignatureSize, &mVertexLayout));
 }
 
- 
