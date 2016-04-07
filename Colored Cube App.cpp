@@ -141,7 +141,7 @@ void ColoredCubeApp::initApp()
 	buildVertexLayouts();
 
 
-	gameStates = gameMenu;
+	gameStates = gamePlay;
 	//mCarMesh.init(md3dDevice, 1.0f);
 
 	mParallelLight.dir      = D3DXVECTOR3(0.57735f, -0.57735f, 0.57735f);
