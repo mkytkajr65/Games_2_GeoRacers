@@ -200,7 +200,7 @@ void ColoredCubeApp::initApp()
 	float roadXLength = 20;
 
 	for(int i = 0; i < OBSTACLES; i++) {
-		obstacles[i].init(&obstacle,0,Vector3(0,0,0),Vector3(0,0,0),0,1);
+		obstacles[i].init(&obstacle,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
 
 		randZPos = ((int)totalRoadZLength - 25) * ( (double)rand() / (double)RAND_MAX ) + 25;
 		randXPos = (rand() % (int)roadXLength)-10;
@@ -303,7 +303,7 @@ void ColoredCubeApp::updateScene(float dt)
 		for(int i = 0; i < ROADS; i++) {
 			if(playerKart.getPosition().x <= road[i].getPosition().x -10 && velX < 0)
 				velX = -velX/2;
-			if(playerKart.getPosition().x >= road[i].getPosition().x + 10 && velX > 0)
+			if(playerKart.getPosition().x + 1>= road[i].getPosition().x + 10 && velX > 0)
 				velX = -velX/2;
 		}
 		velY = 0.0;
@@ -363,8 +363,27 @@ void ColoredCubeApp::updateScene(float dt)
 
 		playerKart.update(dt);
 		for (int i = 0; i < CPU_KARTS; i++) {
-			CPUKarts[i].update(dt);
-		}
+              float oldCPUVel = CPUKarts[i].getVelocity().z;
+              CPUKarts[i].update(dt);
+              for(int j = 0; j < OBSTACLES; j++) {
+                     if(CPUKarts[i].getPosition().z >= obstacles[j].getPosition().z - 6) {
+                           if(CPUKarts[i].getPosition().x > obstacles[j].getPosition().x - 3 && CPUKarts[i].getPosition().x <= obstacles[j].getPosition().x + .5) {
+                                  int dodge = rand()%2;
+                                  if(dodge == 1)
+                                         CPUKarts[i].setVelocity(Vector3(-.2, 0, oldCPUVel));
+                           }
+                           else if(CPUKarts[i].getPosition().x <= obstacles[j].getPosition().x + 3 && CPUKarts[i].getPosition().x > obstacles[j].getPosition().x + .5) {
+                                  int dodge = rand()%2;
+                                  if(dodge == 1)
+                                         CPUKarts[i].setVelocity(Vector3(.2, 0, oldCPUVel));
+                           }
+                           else {
+                                  CPUKarts[i].setVelocity(Vector3(0, 0, oldCPUVel));
+                           }
+                     }
+              }
+       }
+
 
 		for (int i = 0; i < OBSTACLES; i++) {
 			obstacles[i].update(dt);
@@ -374,18 +393,39 @@ void ColoredCubeApp::updateScene(float dt)
 			road[i].update(dt);
 		}
 
-		for(int i = 0;i<OBSTACLES;i++)
-		{
-			if(playerKart.collided(&obstacles[i]) && !playerKart.getAlreadyCollided())
-			{
-				playerKart.setAlreadyCollided(true);
-				playerKart.setVelocity(Vector3(0,0,0));
-				audio->playCue(SQUEAL);
-			}
-			else if(!playerKart.collided(&obstacles[i]) && !playerKart.getAlreadyCollided()){
-				playerKart.setAlreadyCollided(false);
-			}
-		}
+		int count = 0;
+for(int i = 0;i<OBSTACLES;i++)
+       {
+              if(playerKart.collided(&obstacles[i]) && !playerKart.getAlreadyCollided())
+              {
+                     playerKart.setAlreadyCollided(true);
+                     playerKart.setVelocity(Vector3(0,0,0));
+                     audio->playCue(SQUEAL);
+              }
+              else if(playerKart.collided(&obstacles[i]) && playerKart.getAlreadyCollided()) {
+                     playerKart.setVelocity(Vector3(0, 0, 5));
+              }
+              else if(!playerKart.collided(&obstacles[i]) && playerKart.getAlreadyCollided()){
+                     count++;
+                     if(count == OBSTACLES)
+                           playerKart.setAlreadyCollided(false);
+              }
+       }
+for (int j = 0; j < CPU_KARTS; j++) {
+              for(int i = 0;i<OBSTACLES;i++)
+              {
+                     if(CPUKarts[j].collided(&obstacles[i]) && !CPUKarts[j].getAlreadyCollided())
+                     {
+                           CPUKarts[j].setAlreadyCollided(true);
+                           CPUKarts[j].setVelocity(CPUKarts[j].getVelocity()/2);
+                           audio->playCue(SQUEAL);
+                     }else if(!CPUKarts[j].collided(&obstacles[i]) && CPUKarts[j].getAlreadyCollided()){
+                           CPUKarts[j].setAlreadyCollided(false);
+                           CPUKarts[j].setVelocity(CPUKarts[j].getVelocity()*2);  
+                     }
+              }
+       }
+
 		KartPlace place;
 		GameObject* allKarts = new GameObject[CPU_KARTS+1];
 

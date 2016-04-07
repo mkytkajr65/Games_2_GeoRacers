@@ -44,6 +44,7 @@ void CPUKartObject::update(float dt)
 	RotateZ(&rotZM, rotZ);
 	Translate(&transM, position.x, position.y, position.z);
 	world = rotXM * rotYM * rotZM * transM;
+	position += velocity*dt;
 }
 
 bool CPUKartObject::collided(GameObject *gameObject)
