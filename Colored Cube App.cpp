@@ -212,10 +212,14 @@ void ColoredCubeApp::initApp()
 	}
 
 	float randVelocity;
-	int maxVelocity = 10.0;
+	int maxVelocity = PLAYER_MAX_VELOCITY;
 
 	for(int i = 0; i < CPU_KARTS; i++) {
-		randVelocity  = rand() % maxVelocity + 1;
+		randVelocity  = rand() % maxVelocity + 5;
+		if(randVelocity > PLAYER_MAX_VELOCITY)
+			randVelocity = PLAYER_MAX_VELOCITY - 1;
+		else if(randVelocity < PLAYER_MAX_VELOCITY*.75)
+			randVelocity = PLAYER_MAX_VELOCITY*.75;
 		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(0,0,randVelocity),0,1);
 		if (i==0) {
 			CPUKarts[i].setPosition(Vector3(playerKart.getPosition().x + 1.5, 0,playerKart.getPosition().z + 2));
@@ -416,7 +420,7 @@ for(int i = 0;i<OBSTACLES;i++)
                            playerKart.setAlreadyCollided(false);
               }
        }
-for (int j = 0; j < CPU_KARTS; j++) {
+	for (int j = 0; j < CPU_KARTS; j++) {
               for(int i = 0;i<OBSTACLES;i++)
               {
                      if(CPUKarts[j].collided(&obstacles[i]) && !CPUKarts[j].getAlreadyCollided())
@@ -448,7 +452,7 @@ for (int j = 0; j < CPU_KARTS; j++) {
 		mLight3.pos = D3DXVECTOR3(playerKart.getPosition().x + .75, playerKart.getPosition().y, playerKart.getPosition().z);*/
 
 		GameObject* places = place.getKartsPlaces(allKarts, CPU_KARTS+1);
-		
+
 		playerPosition = place.getPlayerPosition(places, CPU_KARTS+1);
 
 		for(int i = 0;i<CPU_KARTS+1;i++){
