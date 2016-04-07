@@ -21,6 +21,7 @@
 #include "Quad.h"
 #include "Road.h"
 #include "KartPlace.h"
+#include <sstream>
 
 
 class ColoredCubeApp : public D3DApp
@@ -45,6 +46,8 @@ private:
 	Vector3 cameraPos;
 	Vector3 lookAt;
 	Camera camera;
+
+	int playerPosition;
 
 	Line line;
 	//Add line, box, and gameobject definitions here
@@ -115,6 +118,8 @@ void ColoredCubeApp::initApp()
 	buildVertexLayouts();
 
 	spinAmount = 0;
+
+	playerPosition = -1;
 
 	pKart.init(md3dDevice, 1, CHARCOAL_GREY);
 	cKart.init(md3dDevice, 1, RED);
@@ -235,11 +240,6 @@ void ColoredCubeApp::updateScene(float dt)
 		velZ = -PLAYER_MAX_VELOCITY ;
 	}
 
-
-
-	_RPT1(0,"Velocity X %f ", velX);
-	_RPT1(0,"Velocity Z %f ", velZ);
-
 	D3DXVec3Normalize(&direction, &direction);
 
 	Vector3 playerVelocity = Vector3(velX, velY, velZ);
@@ -285,8 +285,11 @@ void ColoredCubeApp::updateScene(float dt)
 			}
 		}
 	}
+
 	KartPlace place;
-	GameObject allKarts[CPU_KARTS+1];
+	GameObject* allKarts = new GameObject[CPU_KARTS+1];
+
+
 
 	for(int i = 0;i<CPU_KARTS;i++)
 	{
@@ -297,7 +300,11 @@ void ColoredCubeApp::updateScene(float dt)
 
 	GameObject* places = place.getKartsPlaces(allKarts, CPU_KARTS+1);
 
-	//place.printTopThree(places, CPU_KARTS+1);
+	playerPosition = place.getPlayerPosition(places, CPU_KARTS+1);
+
+	if(playerPosition != -1){//if player has a valid position
+		_RPT1(0,"Velocity X %d ", playerPosition);
+	}
 }
 
 void ColoredCubeApp::drawScene()
@@ -364,9 +371,31 @@ void ColoredCubeApp::drawScene()
 	playerKart.setMTech(mTech);
 	playerKart.draw();
 
+	std::wstring playerPositionText, gameOverText;
+
+	std::wostringstream outs;   
+	outs.precision(6);
+	switch (playerPosition)
+	{
+		case 1:
+			outs << playerPosition << "st";
+			break;
+		case 2: 
+			outs << playerPosition << "th";
+			break;
+		case 3: 
+			outs << playerPosition << "rd";
+			break;
+		default:
+			outs << playerPosition << "th";
+			break;
+	}
+	playerPositionText = outs.str();
+
+
 	// We specify DT_NOCLIP, so we do not care about width/height of the rect.
-	RECT R = {5, 5, 0, 0};
-	mFont->DrawText(0, mFrameStats.c_str(), -1, &R, DT_NOCLIP, BLACK);
+	RECT playerPos = {mClientWidth-85, 10, mClientWidth, mClientHeight};
+	mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
 
 	mSwapChain->Present(0, 0);
 }
