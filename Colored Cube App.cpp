@@ -415,7 +415,7 @@ for(int i = 0;i<OBSTACLES;i++)
                            playerKart.setAlreadyCollided(false);
               }
        }
-for (int j = 0; j < CPU_KARTS; j++) {
+	for (int j = 0; j < CPU_KARTS; j++) {
               for(int i = 0;i<OBSTACLES;i++)
               {
                      if(CPUKarts[j].collided(&obstacles[i]) && !CPUKarts[j].getAlreadyCollided())
@@ -447,7 +447,7 @@ for (int j = 0; j < CPU_KARTS; j++) {
 		mLight3.pos = D3DXVECTOR3(playerKart.getPosition().x + .75, playerKart.getPosition().y, playerKart.getPosition().z);*/
 
 		GameObject* places = place.getKartsPlaces(allKarts, CPU_KARTS+1);
-		//playerPosition = place.getPlayerPosition(places, CPU_KARTS+1);
+		playerPosition = place.getPlayerPosition(places, CPU_KARTS+1);
 
 		for(int i = 0;i<CPU_KARTS+1;i++){
 			if(allKarts[i].getPosition().z + 4.0f >= (ROADS * ROAD_LENGTH)){
