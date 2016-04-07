@@ -21,6 +21,7 @@
 #include "Quad.h"
 #include "Road.h"
 #include "KartPlace.h"
+#include "Light.h"
 
 
 class ColoredCubeApp : public D3DApp
@@ -46,6 +47,13 @@ private:
 	Vector3 lookAt;
 	Camera camera;
 
+	Light mParallelLight;
+	ID3D10ShaderResourceView* mDiffuseMapRV;
+	ID3D10ShaderResourceView* mSpecMapRV;
+	ID3D10ShaderResourceView* boxTexVar;
+	ID3D10ShaderResourceView* carTexVar;
+
+	GameStates gameStates ;
 	Line line;
 	//Add line, box, and gameobject definitions here
 	Box pKart, cKart;
@@ -64,6 +72,16 @@ private:
 	ID3D10EffectTechnique* mTech;
 	ID3D10InputLayout* mVertexLayout;
 	ID3D10EffectMatrixVariable* mfxWVPVar;
+
+	ID3D10EffectMatrixVariable* mfxWorldVar;
+	ID3D10EffectVariable* mfxEyePosVar;
+	ID3D10EffectVariable* mfxLightVar;
+	ID3D10EffectShaderResourceVariable* mfxDiffuseMapVar;
+	ID3D10EffectShaderResourceVariable* mfxSpecMapVar;
+	
+	ID3D10EffectMatrixVariable* mfxTexMtxVar;
+
+	Box mCarMesh;
 
 	D3DXMATRIX mView;
 	D3DXMATRIX mProj;
@@ -90,8 +108,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
 }
 
 ColoredCubeApp::ColoredCubeApp(HINSTANCE hInstance)
-: D3DApp(hInstance), mFX(0), mTech(0), mVertexLayout(0),
-  mfxWVPVar(0), mTheta(0.0f), mPhi(PI*0.25f)
+: D3DApp(hInstance), mFX(0), mTech(0), mfxWVPVar(0), mfxWorldVar(0), mfxEyePosVar(0),
+  mfxLightVar(0), mfxDiffuseMapVar(0), mfxSpecMapVar(0), mfxTexMtxVar(0), 
+  mVertexLayout(0), mDiffuseMapRV(0), mSpecMapRV(0), mTheta(0.0f), mPhi(PI*0.25f)
 {
 	D3DXMatrixIdentity(&mView);
 	D3DXMatrixIdentity(&mProj);
@@ -113,6 +132,25 @@ void ColoredCubeApp::initApp()
 
 	buildFX();
 	buildVertexLayouts();
+
+	
+	gameStates = gameMenu;
+	mCarMesh.init(md3dDevice, 1.0f);
+
+	mParallelLight.dir      = D3DXVECTOR3(0.57735f, -0.57735f, 0.57735f);
+	mParallelLight.ambient  = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
+	mParallelLight.diffuse  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	mParallelLight.specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
+		L"../Games_2_GeoRacers/test.png", 0, 0, &mDiffuseMapRV, 0 ));
+
+	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
+		L"../Games_2_GeoRacers/defaultspec.dds", 0, 0, &mSpecMapRV, 0 ));
+	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
+		L"../Games_2_GeoRacers/box.png", 0, 0, &boxTexVar, 0 ));
+	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
+		L"../Games_2_GeoRacers/stripe.png", 0, 0, &carTexVar, 0 ));
 
 	spinAmount = 0;
 
@@ -304,6 +342,13 @@ void ColoredCubeApp::drawScene()
 {
 	D3DApp::drawScene();
 
+
+	mfxLightVar->SetRawValue(&mParallelLight, 0, sizeof(Light));
+
+
+	mfxDiffuseMapVar->SetResource(mDiffuseMapRV);
+	mfxSpecMapVar->SetResource(mSpecMapRV);
+	
 	md3dDevice->OMSetDepthStencilState(0, 0);
 	float blendFactors[] = {0.0f, 0.0f, 0.0f, 0.0f};
 	md3dDevice->OMSetBlendState(0, blendFactors, 0xffffffff);
@@ -328,6 +373,10 @@ void ColoredCubeApp::drawScene()
 	zLine.setMTech(mTech);
 	zLine.draw();
 
+	D3DXMATRIX texMtx;
+	D3DXMatrixIdentity(&texMtx);
+	mfxTexMtxVar->SetMatrix((float*)&texMtx);
+	
 	D3D10_TECHNIQUE_DESC techDesc;
 	mTech->GetDesc(&techDesc);
 
@@ -336,13 +385,17 @@ void ColoredCubeApp::drawScene()
 		mWVP = road[i].getWorld()*mView*mProj;
 		mfxWVPVar->SetMatrix((float*)&mWVP);
 		mTech->GetDesc( &techDesc );
+		
 		for(UINT p = 0; p < techDesc.Passes; ++p)
 		{
 			mTech->GetPassByIndex( p )->Apply(0);
 			road[i].draw();
 		}
 	}
+	
 
+	mfxDiffuseMapVar->SetResource(carTexVar);
+	mfxSpecMapVar->SetResource(mSpecMapRV);
 	for(int i = 0; i < CPU_KARTS; i++)
 	{
 		mWVP = CPUKarts[i].getWorldMatrix()*mView*mProj;
@@ -350,6 +403,8 @@ void ColoredCubeApp::drawScene()
 		CPUKarts[i].setMTech(mTech);
 		CPUKarts[i].draw();
 	}
+		mfxDiffuseMapVar->SetResource(boxTexVar);
+	mfxSpecMapVar->SetResource(mSpecMapRV);
 
 	for(int i = 0; i < OBSTACLES; i++)
 	{
@@ -358,7 +413,8 @@ void ColoredCubeApp::drawScene()
 		obstacles[i].setMTech(mTech);
 		obstacles[i].draw();
 	}
-	
+	mfxDiffuseMapVar->SetResource(carTexVar);
+	mfxSpecMapVar->SetResource(mSpecMapRV);
 	 mWVP = playerKart.getWorldMatrix()*mView*mProj;
 	mfxWVPVar->SetMatrix((float*)&mWVP);
 	playerKart.setMTech(mTech);
@@ -381,7 +437,7 @@ void ColoredCubeApp::buildFX()
  
 	ID3D10Blob* compilationErrors = 0;
 	HRESULT hr = 0;
-	hr = D3DX10CreateEffectFromFile(L"../Games_2_GeoRacers/color.fx", 0, 0, 
+	hr = D3DX10CreateEffectFromFile(L"../Games_2_GeoRacers/tex.fx", 0, 0, 
 		"fx_4_0", shaderFlags, 0, md3dDevice, 0, 0, &mFX, &compilationErrors, 0);
 	if(FAILED(hr))
 	{
@@ -393,10 +449,17 @@ void ColoredCubeApp::buildFX()
 		DXTrace(__FILE__, (DWORD)__LINE__, hr, L"D3DX10CreateEffectFromFile", true);
 	} 
 
-	mTech = mFX->GetTechniqueByName("ColorTech");
+	mTech = mFX->GetTechniqueByName("TexTech");
 	
-	mfxWVPVar = mFX->GetVariableByName("gWVP")->AsMatrix();
+	mfxWVPVar        = mFX->GetVariableByName("gWVP")->AsMatrix();
+	mfxWorldVar      = mFX->GetVariableByName("gWorld")->AsMatrix();
+	mfxEyePosVar     = mFX->GetVariableByName("gEyePosW");
+	mfxLightVar      = mFX->GetVariableByName("gLight");
+	mfxDiffuseMapVar = mFX->GetVariableByName("gDiffuseMap")->AsShaderResource();
+	mfxSpecMapVar    = mFX->GetVariableByName("gSpecMap")->AsShaderResource();
+	mfxTexMtxVar     = mFX->GetVariableByName("gTexMtx")->AsMatrix();
 }
+
 
 void ColoredCubeApp::buildVertexLayouts()
 {
@@ -404,13 +467,15 @@ void ColoredCubeApp::buildVertexLayouts()
 	D3D10_INPUT_ELEMENT_DESC vertexDesc[] =
 	{
 		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D10_INPUT_PER_VERTEX_DATA, 0},
-		{"COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0}
+		{"NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D10_INPUT_PER_VERTEX_DATA, 0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT,    0, 24, D3D10_INPUT_PER_VERTEX_DATA, 0},
 	};
 
 	// Create the input layout
     D3D10_PASS_DESC PassDesc;
     mTech->GetPassByIndex(0)->GetDesc(&PassDesc);
-    HR(md3dDevice->CreateInputLayout(vertexDesc, 2, PassDesc.pIAInputSignature,
+    HR(md3dDevice->CreateInputLayout(vertexDesc, 3, PassDesc.pIAInputSignature,
 		PassDesc.IAInputSignatureSize, &mVertexLayout));
 }
+
  

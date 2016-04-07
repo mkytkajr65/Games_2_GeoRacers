@@ -50,7 +50,7 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 	mDepthStencilView   = 0;
 	mFont               = 0;
 
-	mMainWndCaption = L"Exam 1";
+	mMainWndCaption = L"Geo Racer";
 	md3dDriverType  = D3D10_DRIVER_TYPE_HARDWARE;
 	mClearColor     = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
 	mClientWidth    = 800;
@@ -415,9 +415,10 @@ void D3DApp::initDirect3D()
 	// Create the device.
 
 	UINT createDeviceFlags = 0;
-//#if defined(DEBUG) || defined(_DEBUG)  
-//    createDeviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
-//#endif
+////#if defined(
+//	) || defined(_DEBUG)  
+////    createDeviceFlags |= D3D10_CREATE_DEVICE_DEBUG;
+////#endif
 
 	HR( D3D10CreateDeviceAndSwapChain(
 			0,                 //default adapter
