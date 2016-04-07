@@ -56,6 +56,8 @@ private:
 	ID3D10ShaderResourceView* carTexVar;
 	ID3D10ShaderResourceView* splashTex;
 
+	bool revPlaying;
+
 	GameStates gameStates ;
 
 	int playerPosition;
@@ -143,6 +145,7 @@ void ColoredCubeApp::initApp()
 	buildFX();
 	buildVertexLayouts();
 
+	revPlaying = false;
 
 	gameStates = gameMenu;
 	//mCarMesh.init(md3dDevice, 1.0f);
@@ -309,6 +312,12 @@ void ColoredCubeApp::updateScene(float dt)
 		velY = 0.0;
 		velZ = playerKart.getVelocity().z;
 
+		if(revPlaying&&playerKart.getVelocity().z>5.0f)
+		{	
+			audio->stopCue(REV);
+			revPlaying = false;
+		}
+
 		//ADD UPDATES HERE
 		Vector3 direction = Vector3(0,0,0);
 		if(GetAsyncKeyState('A') & 0x8000){
@@ -319,21 +328,17 @@ void ColoredCubeApp::updateScene(float dt)
 			direction.x = 1;
 			velX = velX + PLAYER_ACCELERATION;
 		}
-		if(GetAsyncKeyState('S') & 0x8000){
-			direction.z = -1;
-			if(soundTimer >= 2) {
-				soundTimer = 0;
-				audio->stopCue(REV);
-			}
-			velZ = velZ - PLAYER_ACCELERATION;
-		}
 		if(GetAsyncKeyState('W') & 0x8000){
 			direction.z = 1;
 			velZ = velZ + PLAYER_ACCELERATION;
-			soundTimer += dt;
-			if(soundTimer >= 1)
+			if(!revPlaying&&playerKart.getVelocity().z<=10.0f){
 				audio->playCue(REV);
+				revPlaying = true;
+			}
 		}
+		
+		
+		
 
 		if(velX > PLAYER_MAX_VELOCITY){
 			velX = PLAYER_MAX_VELOCITY ;
@@ -443,7 +448,8 @@ for (int j = 0; j < CPU_KARTS; j++) {
 		mLight3.pos = D3DXVECTOR3(playerKart.getPosition().x + .75, playerKart.getPosition().y, playerKart.getPosition().z);*/
 
 		GameObject* places = place.getKartsPlaces(allKarts, CPU_KARTS+1);
-		//playerPosition = place.getPlayerPosition(places, CPU_KARTS+1);
+		
+		playerPosition = place.getPlayerPosition(places, CPU_KARTS+1);
 
 		for(int i = 0;i<CPU_KARTS+1;i++){
 			if(allKarts[i].getPosition().z + 4.0f >= (ROADS * ROAD_LENGTH)){
