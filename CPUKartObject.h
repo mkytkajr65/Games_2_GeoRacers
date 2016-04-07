@@ -15,6 +15,9 @@ public:
 	void update(float dt);
 	bool collided(GameObject *gameObject);
 	bool collided(ObstacleObject *obstacleObject);
+	char type(){return typeOfCar;};
+
+	void init(Box *b, float r, Vector3 pos, Vector3 vel, float sp, float s);
 };
 
 

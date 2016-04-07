@@ -55,6 +55,7 @@ void GameObject::init(Box *b, float r, Vector3 pos, Vector3 vel, float sp, float
 	rotY = 0;
 	rotZ = 0;
 	alreadyCollided = false;
+	typeOfCar = 'p';
 }
 
 void GameObject::update(float dt)

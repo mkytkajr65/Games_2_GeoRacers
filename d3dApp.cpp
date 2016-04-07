@@ -129,7 +129,7 @@ void D3DApp::initApp()
 	md3dDevice->RSSetState(pRS);
 
 	D3DX10_FONT_DESC fontDesc;
-	fontDesc.Height          = 24;
+	fontDesc.Height          = 70;
     fontDesc.Width           = 0;
     fontDesc.Weight          = 0;
     fontDesc.MipLevels       = 1;

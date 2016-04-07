@@ -2,45 +2,39 @@
 
 GameObject* KartPlace::getKartsPlaces(GameObject *karts, int size)
 {
-	GameObject *kartsByPosition = new GameObject[size];
+	GameObject* kartsByPosition = new GameObject[size];
 	for(int i = 0;i<size;i++)
 	{
 		kartsByPosition[i] = karts[i];
 	}
-	bool swapOccurred = true;
-	for(int i = 0;i<=size && swapOccurred;i++)
-	{
-		swapOccurred = false;
-		for(int j = 0;j<size-1;j++)
-		{
-			//_RPT1(0,"z Value %f ", kartsByPosition[j+1].getPosition().z);
-			int second = kartsByPosition[j+1].getPosition().z;
-			int first = kartsByPosition[j].getPosition().z;
-			if(first < second)
-			{
-				GameObject temp = kartsByPosition[j];
-				kartsByPosition[j] = kartsByPosition[j+1];
-				kartsByPosition[j+1] = temp;
-				swapOccurred = true;
-			}
-		}
+	for(int i = 0;i<4;i++){
+		_RPT1(0,"*type* %c ", kartsByPosition[i].type());
+	}
+	GameObject temp; //for swapping
+    for (int i = 0 ; i < size ; i++)
+    {
+        for (int j = 0 ; j < size - 1 ; j++)
+        {
+			if ( kartsByPosition[j].getPosition().z < kartsByPosition[j+1].getPosition().z )
+            {
+                temp = kartsByPosition[j];
+                kartsByPosition[j] = kartsByPosition[j+1];
+                kartsByPosition[j+1] = temp;
+            }
+        }
+    }
+	for(int i = 0;i<4;i++){
+		_RPT1(0,"*type* %c ", kartsByPosition[i].type());
 	}
 	return kartsByPosition;
 }
 
-void KartPlace::printTopThree(GameObject *karts, int size)
-{
-	if(size>=3)
+int KartPlace::getPlayerPosition(GameObject *Karts, int size){
+	for(int i = 0;i< size;i++)
 	{
-		for(int i = 0;i<3;i++)
-		{
-			_RPT1(0,"z Value %f ", karts[i].getPosition().z);
-		}
-	}else{
-		for(int i = 0;i<size;i++)
-		{
-			_RPT1(0,"z Value %f ", karts[i].getPosition().z);
+		if(Karts[i].type()=='p'){
+			return i + 1;
 		}
 	}
-	
+	return -1;
 }

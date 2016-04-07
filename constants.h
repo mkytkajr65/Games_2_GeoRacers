@@ -28,6 +28,7 @@ const char CIRCUIT[] = "Circuit";
 const float PLAYER_ACCELERATION = 0.1f;
 const float PLAYER_MAX_VELOCITY = 20.0f;
 const float ROAD_WIDTH = 20.0f;
+const float ROAD_LENGTH = 100.0f;
 
 enum GameStates {gameMenu, gamePlay, endGame};
 

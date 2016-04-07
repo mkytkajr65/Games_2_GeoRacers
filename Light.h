@@ -36,6 +36,7 @@ struct Material
 	D3DXCOLOR diffuse;
 	D3DXCOLOR specular;
 	float specPower;
+	float range;
 };
 
 #endif // LIGHT_H

@@ -13,6 +13,22 @@ CPUKartObject::CPUKartObject()
 	rotZ = 0;
 }
 
+void CPUKartObject::init(Box *b, float r, Vector3 pos, Vector3 vel, float sp, float s)
+{
+	box = b;
+	radius = r;
+	position = pos;
+	velocity = vel;
+	speed = sp;
+	scale = s;
+	radiusSquared = r*r;
+	rotX = 0;
+	rotY = 0;
+	rotZ = 0;
+	alreadyCollided = false;
+	typeOfCar = 'c';
+}
+
 CPUKartObject::~CPUKartObject()
 {
 	box = NULL;

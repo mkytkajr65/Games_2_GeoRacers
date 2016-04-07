@@ -21,6 +21,7 @@
 #include "Quad.h"
 #include "Road.h"
 #include "KartPlace.h"
+#include <sstream>
 #include "Light.h"
 #include "audio.h"
 
@@ -55,21 +56,24 @@ private:
 	ID3D10ShaderResourceView* carTexVar;
 
 	GameStates gameStates ;
+
+	int playerPosition;
+
 	Line line;
 	//Add line, box, and gameobject definitions here
 	Box pKart, cKart;
 	Obstacle obstacle;
 	GameObject playerKart;
 	CPUKartObject CPUKarts[CPU_KARTS];
-
+	Quad splash;
 	ObstacleObject obstacles[OBSTACLES];
 
 	Road road[ROADS];
 	LineObject xLine, yLine, zLine;
 	Light mLight;
 	Audio *audio;
-	/*Light mLight2;
-	Light mLight3;*/
+
+	bool gameOver;
 
 	float spinAmount;
 
@@ -87,8 +91,6 @@ private:
 	ID3D10EffectShaderResourceVariable* mfxSpecMapVar;
 
 	ID3D10EffectMatrixVariable* mfxTexMtxVar;
-
-	Box mCarMesh;
 
 	D3DXMATRIX mView;
 	D3DXMATRIX mProj;
@@ -159,7 +161,13 @@ void ColoredCubeApp::initApp()
 		L"../Games_2_GeoRacers/stripe.png", 0, 0, &carTexVar, 0 ));
 
 	spinAmount = 0;
+
+	gameOver = false;
+
+	playerPosition = -1;
+
 	soundTimer = 0;
+
 	pKart.init(md3dDevice, 1, CHARCOAL_GREY);
 	cKart.init(md3dDevice, 1, RED);
 	obstacle.init(md3dDevice, 1, WHITE);
@@ -167,6 +175,8 @@ void ColoredCubeApp::initApp()
 	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,0),0,1);
 
 	D3DXCOLOR colors [ROADS] = {YELLOW, GREEN, BLUE};
+
+	splash.init(md3dDevice,1.0f,BLACK);
 
 	float roadZLength = 100.0f;
 
@@ -337,6 +347,7 @@ void ColoredCubeApp::updateScene(float dt)
 		_RPT1(0,"Velocity X %f ", velX);
 		_RPT1(0,"Velocity Z %f ", velZ);
 
+
 		D3DXVec3Normalize(&direction, &direction);
 
 		Vector3 playerVelocity = Vector3(velX, velY, velZ);
@@ -370,6 +381,10 @@ void ColoredCubeApp::updateScene(float dt)
 				playerKart.setAlreadyCollided(false);
 			}
 		}
+		KartPlace place;
+	GameObject* allKarts = new GameObject[CPU_KARTS+1];
+
+
 
 		for(int j = 0;j<CPU_KARTS;j++)
 		{
@@ -384,8 +399,8 @@ void ColoredCubeApp::updateScene(float dt)
 				}
 			}
 		}
-		KartPlace place;
-		GameObject allKarts[CPU_KARTS+1];
+		//KartPlace place;
+		//GameObject allKarts[CPU_KARTS+1];
 
 		for(int i = 0;i<CPU_KARTS;i++)
 		{
@@ -397,14 +412,23 @@ void ColoredCubeApp::updateScene(float dt)
 		mLight3.pos = D3DXVECTOR3(playerKart.getPosition().x + .75, playerKart.getPosition().y, playerKart.getPosition().z);*/
 
 		GameObject* places = place.getKartsPlaces(allKarts, CPU_KARTS+1);
+		//playerPosition = place.getPlayerPosition(places, CPU_KARTS+1);
 
-		//place.printTopThree(places, CPU_KARTS+1);
+		for(int i = 0;i<CPU_KARTS+1;i++){
+			if(allKarts[i].getPosition().z + 4.0f >= (ROADS * ROAD_LENGTH)){
+				gameOver = true;
+				gameStates = endGame;
+			}
+			//place.printTopThree(places, CPU_KARTS+1);
+		}
+
+	
 	}
 	else if(gameStates == endGame){
 		if(GetAsyncKeyState(VK_RETURN) & 0x8000){
 			gameStates = gamePlay;
-		}
 	}
+}
 }
 
 void ColoredCubeApp::drawScene()
@@ -495,9 +519,31 @@ void ColoredCubeApp::drawScene()
 	playerKart.setMTech(mTech);
 	playerKart.draw();
 
+	std::wstring playerPositionText, gameOverText;
+
+	std::wostringstream outs;   
+	outs.precision(6);
+	switch (playerPosition)
+	{
+		case 1:
+			outs << playerPosition << "st";
+			break;
+		case 2: 
+			outs << playerPosition << "th";
+			break;
+		case 3: 
+			outs << playerPosition << "rd";
+			break;
+		default:
+			outs << playerPosition << "th";
+			break;
+	}
+	playerPositionText = outs.str();
+
+
 	// We specify DT_NOCLIP, so we do not care about width/height of the rect.
-	RECT R = {5, 5, 0, 0};
-	mFont->DrawText(0, mFrameStats.c_str(), -1, &R, DT_NOCLIP, BLACK);
+	RECT playerPos = {mClientWidth-85, 10, mClientWidth, mClientHeight};
+	mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
 
 	mSwapChain->Present(0, 0);
 }

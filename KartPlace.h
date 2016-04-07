@@ -9,7 +9,8 @@ class KartPlace
 {
 public:
 	static GameObject* getKartsPlaces(GameObject *Karts, int size);
-	static void printTopThree(GameObject *Karts, int size);
+	
+	static int getPlayerPosition(GameObject *Karts, int size);
 };
 
 

@@ -15,6 +15,8 @@ public:
 	GameObject();
 	~GameObject();
 
+	virtual char type(){return typeOfCar;};
+
 	void init(Box *b, float r, Vector3 pos, Vector3 vel, float sp, float s);
 	void draw();
 	void update(float dt);
@@ -59,6 +61,7 @@ protected:
 	float scale;
 	ID3D10EffectTechnique* mTech;
 	float rotX, rotY, rotZ;
+	char typeOfCar;
 };
 
 

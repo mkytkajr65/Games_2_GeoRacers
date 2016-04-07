@@ -28,10 +28,12 @@ void Road::init(ID3D10Device* device, float scale, D3DXCOLOR c)
 
 	 Vertex vertices[] =
     {
-		{D3DXVECTOR3(ROAD_WIDTH/2, 0.0f, 100.0f), c},
-		{D3DXVECTOR3(-ROAD_WIDTH/2, 0.0f, 100.0f), c},
+
+		{D3DXVECTOR3(ROAD_WIDTH/2, 0.0f, ROAD_LENGTH), c},
+		{D3DXVECTOR3(-ROAD_WIDTH/2, 0.0f, ROAD_LENGTH), c},
 		{D3DXVECTOR3(ROAD_WIDTH/2, 0.0f, 0.0f), c},
 		{D3DXVECTOR3(-ROAD_WIDTH/2, 0.0f, 0.0f), c}
+
     };
 
 	// Scale the Quad.
