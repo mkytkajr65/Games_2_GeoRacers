@@ -131,7 +131,7 @@ void ColoredCubeApp::initApp()
 	cKart.init(md3dDevice, 1, RED);
 	obstacle.init(md3dDevice, 1, WHITE);
 
-	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,-3),15,1);
+	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,0),0,1);
 
 	D3DXCOLOR colors [ROADS] = {YELLOW, GREEN, BLUE};
 
@@ -240,29 +240,72 @@ void ColoredCubeApp::updateScene(float dt)
 	xLine.update(dt);
 	yLine.update(dt);
 	zLine.update(dt);
+
+	float velX, velY, velZ;
+
+	velX = playerKart.getVelocity().x;
+	for(int i = 0; i < ROADS; i++) {
+		if(playerKart.getPosition().x <= road[i].getPosition().x -10 && velX < 0)
+			velX = -velX/2;
+		if(playerKart.getPosition().x >= road[i].getPosition().x + 10 && velX > 0)
+			velX = -velX/2;
+	}
+	velY = 0.0;
+	velZ = playerKart.getVelocity().z;
+
 	//ADD UPDATES HERE
 	Vector3 direction = Vector3(0,0,0);
-	if(GetAsyncKeyState('A') & 0x8000)
+	if(GetAsyncKeyState('A') & 0x8000){
 			direction.x = -1;
-	if(GetAsyncKeyState('D') & 0x8000)
-			direction.x = 1;
-	if(GetAsyncKeyState('S') & 0x8000)
-			direction.z = -1;
-	if(GetAsyncKeyState('W') & 0x8000) {
-			direction.z = 1;
-			soundTimer += dt;
-			if(soundTimer >= 1)
-				audio->playCue(REV);
+			velX = velX - PLAYER_ACCELERATION;
 	}
+	if(GetAsyncKeyState('D') & 0x8000){
+			direction.x = 1;
+			velX = velX + PLAYER_ACCELERATION;
+	}
+	if(GetAsyncKeyState('S') & 0x8000){
+			direction.z = -1;
 	if(soundTimer >= 2) {
 		soundTimer = 0;
 		audio->stopCue(REV);
 	}
+			velZ = velZ - PLAYER_ACCELERATION;
+	}
+	if(GetAsyncKeyState('W') & 0x8000){
+			direction.z = 1;
+			velZ = velZ + PLAYER_ACCELERATION;
+			soundTimer += dt;
+			if(soundTimer >= 1)
+				audio->playCue(REV);
+	}
+	
+
+	
+
+	if(velX > PLAYER_MAX_VELOCITY){
+		velX = PLAYER_MAX_VELOCITY ;
+	}else if(velX < -PLAYER_MAX_VELOCITY){
+		velX = -PLAYER_MAX_VELOCITY ;
+	}
+
+	if(velZ > PLAYER_MAX_VELOCITY){
+		velZ = PLAYER_MAX_VELOCITY ;
+	}else if(velZ < -PLAYER_MAX_VELOCITY){
+		velZ = -PLAYER_MAX_VELOCITY ;
+	}
+
+
+
+	_RPT1(0,"Velocity X %f ", velX);
+	_RPT1(0,"Velocity Z %f ", velZ);
+
 	D3DXVec3Normalize(&direction, &direction);
 
-	camera.update(dt, playerKart.getSpeed() * direction);
+	Vector3 playerVelocity = Vector3(velX, velY, velZ);
 
-	playerKart.setVelocity(playerKart.getSpeed() * direction);
+	playerKart.setVelocity(playerVelocity);
+
+	camera.update(dt, playerVelocity);
 
 	playerKart.update(dt);
 	for (int i = 0; i < CPU_KARTS; i++) {
@@ -279,10 +322,28 @@ void ColoredCubeApp::updateScene(float dt)
 
 	for(int i = 0;i<OBSTACLES;i++)
 	{
-		if(playerKart.collided(&obstacles[i]))
+		if(playerKart.collided(&obstacles[i]) && !playerKart.getAlreadyCollided())
 		{
+			playerKart.setAlreadyCollided(true);
 			playerKart.setVelocity(Vector3(0,0,0));
 			audio->playCue(SQUEAL);
+		}
+		else if(!playerKart.collided(&obstacles[i]) && !playerKart.getAlreadyCollided()){
+			playerKart.setAlreadyCollided(false);
+		}
+	}
+
+	for(int j = 0;j<CPU_KARTS;j++)
+	{
+		for(int i = 0;i<OBSTACLES;i++)
+		{
+			if(CPUKarts[j].collided(&obstacles[i]) && !CPUKarts[j].getAlreadyCollided())
+			{
+				CPUKarts[j].setAlreadyCollided(true);
+				CPUKarts[j].setVelocity(Vector3(0,0,0));
+			}else if(!CPUKarts[j].collided(&obstacles[i]) && !CPUKarts[j].getAlreadyCollided()){
+				CPUKarts[j].setAlreadyCollided(false);
+			}
 		}
 	}
 	KartPlace place;
@@ -299,7 +360,7 @@ void ColoredCubeApp::updateScene(float dt)
 
 	GameObject* places = place.getKartsPlaces(allKarts, CPU_KARTS+1);
 
-	place.printTopThree(places, CPU_KARTS+1);
+	//place.printTopThree(places, CPU_KARTS+1);
 }
 
 void ColoredCubeApp::drawScene()
