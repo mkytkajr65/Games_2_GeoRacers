@@ -17,7 +17,9 @@
 const int ROADS = 3;
 const int OBSTACLES = 20;
 const int CPU_KARTS = 3;
-
+const float PLAYER_ACCELERATION = 0.1f;
+const float PLAYER_MAX_VELOCITY = 20.0f;
+const float ROAD_WIDTH = 20.0f;
 
 
 
