@@ -17,9 +17,18 @@
 const int ROADS = 3;
 const int OBSTACLES = 20;
 const int CPU_KARTS = 3;
+
+const char WAVE_BANK[]  = "..\\Games_2_GeoRacers\\audio\\Win\\Wave Bank.xwb";
+// SOUND_BANK must be location of .xsb file.
+const char SOUND_BANK[] = "..\\Games_2_GeoRacers\\audio\\Win\\Sound Bank.xsb";
+
+const char REV[] = "Rev";
+const char SQUEAL[] = "Squeal";
+const char CIRCUIT[] = "Circuit";
 const float PLAYER_ACCELERATION = 0.1f;
 const float PLAYER_MAX_VELOCITY = 20.0f;
 const float ROAD_WIDTH = 20.0f;
+
 
 
 
