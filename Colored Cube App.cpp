@@ -24,6 +24,7 @@
 #include <sstream>
 #include "Light.h"
 #include "audio.h"
+#include "PowerUpObject.h"
 
 
 class ColoredCubeApp : public D3DApp
@@ -64,12 +65,13 @@ private:
 
 	Line line;
 	//Add line, box, and gameobject definitions here
-	Box pKart, cKart;
+	Box pKart, cKart, boostBox;
 	Obstacle obstacle;
 	GameObject playerKart;
 	CPUKartObject CPUKarts[CPU_KARTS];
 	Quad splash;
 	ObstacleObject obstacles[OBSTACLES];
+	PowerUpObject boosts[POWER_UPS];
 
 	Road road[ROADS];
 	LineObject xLine, yLine, zLine;
@@ -177,7 +179,9 @@ void ColoredCubeApp::initApp()
 
 	pKart.init(md3dDevice, 1, CHARCOAL_GREY);
 	cKart.init(md3dDevice, 1, RED);
+	boostBox.init(md3dDevice, 1, GREEN);
 	obstacle.init(md3dDevice, 1, WHITE);
+	
 
 	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,0),0,1);
 
@@ -210,7 +214,14 @@ void ColoredCubeApp::initApp()
 
 		obstacles[i].setPosition(Vector3(randXPos, -1.2, randZPos));
 	}
+	for(int i = 0; i < POWER_UPS; i++) {
+		boosts[i].init(&boostBox,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
 
+		randZPos = ((int)totalRoadZLength - 25) * ( (double)rand() / (double)RAND_MAX ) + 25;
+		randXPos = (rand() % (int)roadXLength)-10;
+
+		boosts[i].setPosition(Vector3(randXPos, -1.2, randZPos));
+	}
 	float randVelocity;
 	int maxVelocity = PLAYER_MAX_VELOCITY;
 
@@ -397,6 +408,9 @@ void ColoredCubeApp::updateScene(float dt)
 		for (int i = 0; i < OBSTACLES; i++) {
 			obstacles[i].update(dt);
 		}
+		for (int i = 0; i < POWER_UPS; i++) {
+			boosts[i].update(dt);
+		}
 		for(int i = 0;i<ROADS;i++)
 		{
 			road[i].update(dt);
@@ -533,6 +547,15 @@ for(int i = 0;i<OBSTACLES;i++)
 		randXPos = (rand() % (int)roadXLength)-10;
 
 		obstacles[i].setPosition(Vector3(randXPos, -1.2, randZPos));
+	}
+
+	for(int i = 0; i < POWER_UPS; i++) {
+		boosts[i].init(&boostBox,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
+
+		randZPos = ((int)totalRoadZLength - 25) * ( (double)rand() / (double)RAND_MAX ) + 25;
+		randXPos = (rand() % (int)roadXLength)-10;
+
+		boosts[i].setPosition(Vector3(randXPos, -1.2, randZPos));
 	}
 
 	float randVelocity;
@@ -682,6 +705,14 @@ void ColoredCubeApp::drawScene()
 				mfxWVPVar->SetMatrix((float*)&mWVP);
 				obstacles[i].setMTech(mTech);
 				obstacles[i].draw();
+			}
+
+			for(int i = 0; i < POWER_UPS; i++)
+			{
+				mWVP = boosts[i].getWorldMatrix()*mView*mProj;
+				mfxWVPVar->SetMatrix((float*)&mWVP);
+				boosts[i].setMTech(mTech);
+				boosts[i].draw();
 			}
 			mfxDiffuseMapVar->SetResource(carTexVar);
 			mfxSpecMapVar->SetResource(mSpecMapRV);
