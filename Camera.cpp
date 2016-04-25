@@ -36,13 +36,14 @@ void Camera::init(Vector3 p, Vector3 dir, Vector3 _lookAt, GameObject *pl)
 	position = p;
 	direction = dir;
 	player = pl;
+	lastRotation = 0.0;
 }
 
 void Camera::setPerspective()
 {
 	D3DXMatrixPerspectiveFovLH(&mProj, FoV, aspectRatio, nearClippingPlane,farClippingPlane); 
 }
-void Camera::update(float dt, Vector3 vel)
+void Camera::update(float dt)
 {
 	//_RPT1(0, "Player position %f \n", player->getPosition().z);
 	bool yawUpdate = false;
@@ -59,29 +60,27 @@ void Camera::update(float dt, Vector3 vel)
 	Identity(&pitchR);
 	Identity(&rollR);
 
-	Vector3 dir = vel;
-	Matrix temp = yawR;
+	RotateY(&yawR, ToRadian(player->getRotY()));
+
+	//_RPT1(0,"  rotation %f\n",ToRadian(player->getRotY()));
+
+	Vector3 dir = player->getVelocity();
 	Transform(&dir, &dir, &yawR);
 	Vector3 foo = dir;
 	dir = dir*dt;
 	position += dir;
 	
 
-	if (yawUpdate)
-	{
-	Vector3 transformedRef = Vector3(1,0,0);   
-	Transform(&transformedRef, &transformedRef,&temp); //
+	Vector3 transformedRef = Vector3(0,0,1);   
+	Transform(&transformedRef, &transformedRef,&yawR); //
 	D3DXVec3Normalize(&transformedRef, &transformedRef);
     lookAt = transformedRef * 10;
+
 	lookAt += position;
 	//_RPT1(0,"lookAt x %f ", lookAt.x);
 	//_RPT1(0,"  lookAt z %f\n",lookAt.z);
 
-	yawUpdate = false;
-	}
-	else{
+	lookAt += dir;
 
-		lookAt += dir;
-	}
 	D3DXMatrixLookAtLH(&mView, &position, &lookAt, &up);
 }

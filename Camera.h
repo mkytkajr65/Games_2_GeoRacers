@@ -15,7 +15,7 @@ public:
 	void init(Vector3 position, Vector3 direction, Vector3 _lookAt, GameObject *player);
 	Matrix getViewMatrix() {return mView;}
 	Matrix getProjectionMatrix() {return mProj;}
-	void update(float dt, Vector3 vel);
+	void update(float dt);
 	void setPosition(Vector3 pos) {position = pos;}
 	Vector3 getPosition() {return position;}
 	void setDirection(Vector3 dir) {direction = dir;}
@@ -31,6 +31,7 @@ private:
 	Vector3 position;
 	Vector3 direction;
 	GameObject *player;
+	float lastRotation;
 	float speed;
 	float aspectRatio;
 	float FoV;

@@ -304,74 +304,18 @@ void ColoredCubeApp::updateScene(float dt)
 		yLine.update(dt);
 		zLine.update(dt);
 
-		float velX, velY, velZ;
-
-		velX = playerKart.getVelocity().x;
-		for(int i = 0; i < ROADS; i++) {
-			if(playerKart.getPosition().x <= road[i].getPosition().x -10 && velX < 0)
-				velX = -velX/2;
-			if(playerKart.getPosition().x + 1>= road[i].getPosition().x + 10 && velX > 0)
-				velX = -velX/2;
-		}
-		velY = 0.0;
-		velZ = playerKart.getVelocity().z;
-
-		if(revPlaying&&playerKart.getVelocity().z>5.0f)
-		{	
-			audio->stopCue(REV);
-			revPlaying = false;
-		}
-
-		//ADD UPDATES HERE
-		Vector3 direction = Vector3(0,0,0);
-		if(GetAsyncKeyState('A') & 0x8000){
-			direction.x = -1;
-			velX = velX - PLAYER_ACCELERATION;
-		}
-		if(GetAsyncKeyState('D') & 0x8000){
-			direction.x = 1;
-			velX = velX + PLAYER_ACCELERATION;
-		}
-		if(GetAsyncKeyState('W') & 0x8000){
-			direction.z = 1;
-			velZ = velZ + PLAYER_ACCELERATION;
-			if(!revPlaying&&playerKart.getVelocity().z<=10.0f){
-				audio->playCue(REV);
-				revPlaying = true;
-			}
-		}
-		
-		
-		
-
-		if(velX > PLAYER_MAX_VELOCITY){
-			velX = PLAYER_MAX_VELOCITY ;
-		}else if(velX < -PLAYER_MAX_VELOCITY){
-			velX = -PLAYER_MAX_VELOCITY ;
-		}
-
-		if(velZ > PLAYER_MAX_VELOCITY){
-			velZ = PLAYER_MAX_VELOCITY ;
-		}else if(velZ < -PLAYER_MAX_VELOCITY){
-			velZ = -PLAYER_MAX_VELOCITY ;
-		}
-
-
-
-		_RPT1(0,"Velocity X %f ", velX);
-		_RPT1(0,"Velocity Z %f ", velZ);
-
-
-		D3DXVec3Normalize(&direction, &direction);
-
-		Vector3 playerVelocity = Vector3(velX, velY, velZ);
-
-		playerKart.setVelocity(playerVelocity);
-
-		camera.update(dt, playerVelocity);
-
 		playerKart.update(dt);
-		for (int i = 0; i < CPU_KARTS; i++) {
+
+		camera.update(dt);
+
+		
+
+		for(int i = 0;i<CPU_KARTS;i++)
+		{
+			CPUKarts[i].update(dt);
+		}
+
+		/*for (int i = 0; i < CPU_KARTS; i++) {
               float oldCPUVel = CPUKarts[i].getVelocity().z;
               CPUKarts[i].update(dt);
               for(int j = 0; j < OBSTACLES; j++) {
@@ -391,7 +335,7 @@ void ColoredCubeApp::updateScene(float dt)
                            }
                      }
               }
-       }
+       }*/
 
 
 		for (int i = 0; i < OBSTACLES; i++) {
@@ -467,7 +411,7 @@ for(int i = 0;i<OBSTACLES;i++)
 	}
 	else if(gameStates == endGame){
 		splash.setPosition(playerKart.getPosition());
-		camera.update(dt,Vector3(0,0,0));
+		camera.update(dt);
 		splash.setRotYAngle(ToRadian(90));
 		if(GetAsyncKeyState(VK_RETURN) & 0x8000){
 			gameStates = gamePlay;

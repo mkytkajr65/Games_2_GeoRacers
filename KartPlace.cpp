@@ -7,9 +7,6 @@ GameObject* KartPlace::getKartsPlaces(GameObject *karts, int size)
 	{
 		kartsByPosition[i] = karts[i];
 	}
-	for(int i = 0;i<4;i++){
-		_RPT1(0,"*type* %c ", kartsByPosition[i].type());
-	}
 	GameObject temp; //for swapping
     for (int i = 0 ; i < size ; i++)
     {
@@ -23,9 +20,6 @@ GameObject* KartPlace::getKartsPlaces(GameObject *karts, int size)
             }
         }
     }
-	for(int i = 0;i<4;i++){
-		_RPT1(0,"*type* %c ", kartsByPosition[i].type());
-	}
 	return kartsByPosition;
 }
 

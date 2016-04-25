@@ -7,6 +7,7 @@
 #include "Box.h"
 #include "constants.h"
 #include "ObstacleObject.h"
+#include "d3dApp.h"
 
 class GameObject
 {
@@ -21,12 +22,13 @@ public:
 	void draw();
 	void update(float dt);
 
+	float getRotY(){return rotY;}
 	void setPosition (Vector3 pos) {position = pos;}
 	Vector3 getPosition() {return position;}
 	void setVelocity (Vector3 vel) {velocity = vel;}
 	Vector3 getVelocity() {return velocity;}
-	void setSpeed(float s) {speed = s;}
-	float getSpeed() {return speed;}
+	void setSpeed(float s) {currentSpeed = s;}
+	float getSpeed() {return currentSpeed;}
 	void setRadius(float r) {radius = r; radiusSquared = (scale*r)*(scale*r);}
 	float getRadiusSquare() {return radiusSquared;}
 	float getRadius() {return radius;}
@@ -53,7 +55,8 @@ protected:
 	bool alreadyCollided;
 	Vector3 position;
 	Vector3 velocity;
-	float speed;
+	float currentPlayerAcceleration;
+	float currentSpeed;
 	float radius;
 	float radiusSquared;
 	bool active;

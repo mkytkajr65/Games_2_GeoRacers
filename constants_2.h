@@ -43,6 +43,17 @@
 //const UCHAR ALT_KEY      = VK_MENU;     // Alt key
 //const UCHAR ENTER_KEY    = VK_RETURN;   // Enter key
 
+#define Vector3 D3DXVECTOR3
+#define Matrix D3DXMATRIX
+#define Identity D3DXMatrixIdentity
+#define Translate D3DXMatrixTranslation
+#define RotateX D3DXMatrixRotationX
+#define RotateY D3DXMatrixRotationY
+#define RotateZ D3DXMatrixRotationZ
+#define ToRadian D3DXToRadian
+#define ToDegree D3DXToDegree
+#define Transform D3DXVec3TransformCoord
+
 
 
 #endif
