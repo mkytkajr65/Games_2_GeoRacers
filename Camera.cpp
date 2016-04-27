@@ -60,11 +60,31 @@ void Camera::update(float dt)
 	Identity(&pitchR);
 	Identity(&rollR);
 
-	RotateY(&yawR, ToRadian(player->getRotY()));
+	RotateY(&yawR, ToRadian(player->getRotY()/2));
 
 	//_RPT1(0,"  rotation %f\n",ToRadian(player->getRotY()));
 
-	Vector3 dir = player->getVelocity();
+	//starting from the player postion, translate camera by a specified offset
+	//
+
+
+	Matrix offsetTranslate;
+
+	Vector3 offset = Vector3(0, 2, -10);
+
+	//Translate(&offsetTranslate, 0, 2, -10);
+
+	Vector3 transformedReference;
+
+	Transform(&transformedReference, &offset, &yawR);
+
+	Transform(&transformedReference, &transformedReference, &yawR);
+
+	position = player->getPosition() + transformedReference;
+
+	lookAt = player->getPosition();
+
+	/*Vector3 dir = player->getVelocity();
 	Transform(&dir, &dir, &yawR);
 	Vector3 foo = dir;
 	dir = dir*dt;
@@ -80,7 +100,7 @@ void Camera::update(float dt)
 	//_RPT1(0,"lookAt x %f ", lookAt.x);
 	//_RPT1(0,"  lookAt z %f\n",lookAt.z);
 
-	lookAt += dir;
+	lookAt += dir;*/
 
 	D3DXMatrixLookAtLH(&mView, &position, &lookAt, &up);
 }

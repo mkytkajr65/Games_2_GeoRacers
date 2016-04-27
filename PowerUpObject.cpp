@@ -65,7 +65,7 @@ void PowerUpObject::update(float dt)
 
 	velX = getVelocity().x;
 	velY = 0.0;
-	velZ = getVelocity().z + PLAYER_ACCELERATION;
+	velZ = getVelocity().z + PLAYER_MAX_ACCELERATION;
 
 	
 
