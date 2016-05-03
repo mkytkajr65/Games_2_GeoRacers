@@ -10,6 +10,7 @@ Road::Road()
 	rotY = 0;
 	rotZ = 0;
 	Identity(&world);
+	norm = D3DXVECTOR3(0, 1, 0);
 }
  
 Road::~Road()
@@ -29,10 +30,10 @@ void Road::init(ID3D10Device* device, float scale, D3DXCOLOR c)
 	 Vertex vertices[] =
     {
 
-		{D3DXVECTOR3(ROAD_WIDTH/2, 0.0f, ROAD_LENGTH), c},
-		{D3DXVECTOR3(-ROAD_WIDTH/2, 0.0f, ROAD_LENGTH), c},
-		{D3DXVECTOR3(ROAD_WIDTH/2, 0.0f, 0.0f), c},
-		{D3DXVECTOR3(-ROAD_WIDTH/2, 0.0f, 0.0f), c}
+		{D3DXVECTOR3(ROAD_WIDTH/2, 0.0f, ROAD_LENGTH), D3DXVECTOR3(0, 1, 0), c, WHITE, D3DXVECTOR2(1, 1)},
+		{D3DXVECTOR3(-ROAD_WIDTH/2, 0.0f, ROAD_LENGTH), D3DXVECTOR3(0, 1, 0), c, WHITE, D3DXVECTOR2(1, 0)},
+		{D3DXVECTOR3(ROAD_WIDTH/2, 0.0f, 0.0f), D3DXVECTOR3(0, 1, 0), c, WHITE, D3DXVECTOR2(0, 1)},
+		{D3DXVECTOR3(-ROAD_WIDTH/2, 0.0f, 0.0f), D3DXVECTOR3(0, 1, 0), c, WHITE, D3DXVECTOR2(0, 0)}
 
     };
 

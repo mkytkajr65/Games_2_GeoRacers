@@ -19,29 +19,38 @@ void Box::init(ID3D10Device* device, float scale, D3DXCOLOR c)
 {
 	md3dDevice = device;
  
-	mNumVertices = 16;
-	mNumFaces    = 24; // 2 per quad
+	mNumVertices = 24;
+	mNumFaces    = 36; // 2 per quad
 
 	// Create vertex buffer
     Vertex vertices[] =
     {
-		{D3DXVECTOR3(-0.5f, -.5f, -2.0f), c},
-		{D3DXVECTOR3(-0.5f, +.5f, -2.0f), c},
-		{D3DXVECTOR3(+0.5f, +.5f, -2.0f), c},
-		{D3DXVECTOR3(+0.5f, -.5f, -2.0f), c},
-		{D3DXVECTOR3(-0.5f, -.5f, +2.0f), c},
-		{D3DXVECTOR3(-0.5f, +.5f, +2.0f), c},
-		{D3DXVECTOR3(+0.5f, +.5f, +2.0f), c},
-		{D3DXVECTOR3(+0.5f, -.5f, +2.0f), c},
+		{D3DXVECTOR3(-0.5f, -.5f, -2.0f), D3DXVECTOR3(0, 0, -1), c, WHITE, D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(-0.5f, +.5f, -2.0f), D3DXVECTOR3(0, 0, -1), c, WHITE, D3DXVECTOR2(1, 0)},
+		{D3DXVECTOR3(+0.5f, +.5f, -2.0f), D3DXVECTOR3(0, 0, -1), c, WHITE, D3DXVECTOR2(0, 1)},
+		{D3DXVECTOR3(+0.5f, -.5f, -2.0f), D3DXVECTOR3(0, 0, -1), c, WHITE, D3DXVECTOR2(1, 1)},
+		{D3DXVECTOR3(-0.5f, -.5f, +2.0f), D3DXVECTOR3(0, 0, 1), c, WHITE, D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(-0.5f, +.5f, +2.0f), D3DXVECTOR3(0, 0, 1), c, WHITE, D3DXVECTOR2(1, 0)},
+		{D3DXVECTOR3(+0.5f, +.5f, +2.0f), D3DXVECTOR3(0, 0, 1), c, WHITE, D3DXVECTOR2(0, 1)},
+		{D3DXVECTOR3(+0.5f, -.5f, +2.0f), D3DXVECTOR3(0, 0, 1), c, WHITE, D3DXVECTOR2(1, 1)},
 										  
-		{D3DXVECTOR3(-0.5f, -.5f, -0.0f), c},
-		{D3DXVECTOR3(-0.5f, +.5f, -0.0f), c},
-		{D3DXVECTOR3(+0.5f, +.5f, -0.0f), c},
-		{D3DXVECTOR3(+0.5f, -.5f, -0.0f), c},
-		{D3DXVECTOR3(-0.5f, -.5f, +3.0f), c},
-		{D3DXVECTOR3(-0.5f, +.5f, +3.0f), c},
-		{D3DXVECTOR3(+0.5f, +.5f, +3.0f), c},
-		{D3DXVECTOR3(+0.5f, -.5f, +3.0f), c}
+		{D3DXVECTOR3(-0.5f, -.5f, -0.0f), D3DXVECTOR3(0, -1, 0), c, WHITE, D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(-0.5f, +.5f, -0.0f), D3DXVECTOR3(0, 1, 0), c, WHITE, D3DXVECTOR2(1, 0)},
+		{D3DXVECTOR3(+0.5f, +.5f, -0.0f), D3DXVECTOR3(0, 1, 0), c, WHITE, D3DXVECTOR2(0, 1)},
+		{D3DXVECTOR3(+0.5f, -.5f, -0.0f), D3DXVECTOR3(0, -1, 0), c, WHITE, D3DXVECTOR2(1, 1)},
+		{D3DXVECTOR3(-0.5f, -.5f, +3.0f), D3DXVECTOR3(0, -1, 0), c, WHITE, D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(-0.5f, +.5f, +3.0f), D3DXVECTOR3(0, 1, 0), c, WHITE, D3DXVECTOR2(1, 0)},
+		{D3DXVECTOR3(+0.5f, +.5f, +3.0f), D3DXVECTOR3(0, 1, 0), c, WHITE, D3DXVECTOR2(0, 1)},
+		{D3DXVECTOR3(+0.5f, -.5f, +3.0f), D3DXVECTOR3(0, -1, 0), c, WHITE, D3DXVECTOR2(1, 1)},
+
+		{D3DXVECTOR3(-0.5f, -.5f, -0.0f), D3DXVECTOR3(-1, 0, 0), c, WHITE, D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(-0.5f, +.5f, -0.0f), D3DXVECTOR3(-1, 0, 0), c, WHITE, D3DXVECTOR2(1, 0)},
+		{D3DXVECTOR3(+0.5f, +.5f, -0.0f), D3DXVECTOR3(1, 0, 0), c, WHITE, D3DXVECTOR2(0, 1)},
+		{D3DXVECTOR3(+0.5f, -.5f, -0.0f), D3DXVECTOR3(1, 0, 0), c, WHITE, D3DXVECTOR2(1, 1)},
+		{D3DXVECTOR3(-0.5f, -.5f, +3.0f), D3DXVECTOR3(-1, 0, 0), c, WHITE, D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(-0.5f, +.5f, +3.0f), D3DXVECTOR3(-1, 0, 0), c, WHITE, D3DXVECTOR2(1, 0)},
+		{D3DXVECTOR3(+0.5f, +.5f, +3.0f), D3DXVECTOR3(1, 0, 0), c, WHITE, D3DXVECTOR2(0, 1)},
+		{D3DXVECTOR3(+0.5f, -.5f, +3.0f), D3DXVECTOR3(1, 0, 0), c, WHITE, D3DXVECTOR2(1, 1)}
 	
 	};
 
@@ -105,7 +114,31 @@ void Box::init(ID3D10Device* device, float scale, D3DXCOLOR c)
 
 		// bottom face
 		12, 8, 11, 
-		12, 11, 15
+		12, 11, 15,
+
+		//third
+		16, 17, 18,
+		16, 18, 19,
+
+		// back face
+		20, 22, 21,
+		20, 23, 22,
+
+		// left face
+		20, 21, 17,
+		20, 17, 16,
+
+		// right face
+		19, 18, 22,
+		19, 22, 23,
+
+		// top face
+		17, 21, 22,
+		17, 22, 18,
+
+		// bottom face
+		20, 16, 9, 
+		20, 19, 23
 	};
 
 	D3D10_BUFFER_DESC ibd;

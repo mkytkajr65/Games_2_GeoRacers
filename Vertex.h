@@ -9,7 +9,10 @@
 struct Vertex
 {
 	D3DXVECTOR3 pos;
-	D3DXCOLOR   color;
+	D3DXVECTOR3 norm;
+	D3DXCOLOR diff;
+	D3DXCOLOR spec;
+	D3DXVECTOR2 tex;
 };
  
 #endif // VERTEX_H
