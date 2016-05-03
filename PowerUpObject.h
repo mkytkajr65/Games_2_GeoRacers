@@ -45,6 +45,7 @@ public:
 	void setRotationZ(float r) {rotZ = r;}
 	void setAlreadyCollided(bool ac) {alreadyCollided = ac;}
 	bool getAlreadyCollided() {return alreadyCollided;}
+	char getObjType() {return objType;}
 
 	//define setWorldMatrix here
 	void setWorldMatrix(Matrix w) {world = w;}
@@ -57,6 +58,7 @@ protected:
 	float speed;
 	float radius;
 	float radiusSquared;
+	char objType;
 	bool active;
 	Matrix world;
 	float scale;

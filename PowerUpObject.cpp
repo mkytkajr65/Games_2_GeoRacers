@@ -11,6 +11,7 @@ PowerUpObject::PowerUpObject()
 	rotY = 0;
 	rotZ = 0;
 	alreadyCollided = false;
+	objType = 'P';
 }
 
 PowerUpObject::~PowerUpObject()

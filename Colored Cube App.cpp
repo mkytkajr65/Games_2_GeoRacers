@@ -433,6 +433,7 @@ for(int i = 0;i<OBSTACLES;i++)
               if(playerKart.collided(&obstacles[i]) && !playerKart.getAlreadyCollided())
               {
                      playerKart.setAlreadyCollided(true);
+					 playerKart.setCObjType('O');
                      playerKart.setVelocity(Vector3(0,0,0));
                      audio->playCue(SQUEAL);
               }
@@ -441,8 +442,11 @@ for(int i = 0;i<OBSTACLES;i++)
               }
               else if(!playerKart.collided(&obstacles[i]) && playerKart.getAlreadyCollided()){
                      count++;
-                     if(count == OBSTACLES)
+					 
+                     if(count == OBSTACLES){
+						 playerKart.setCObjType('N');
                            playerKart.setAlreadyCollided(false);
+					 }
               }
        }
 	for (int j = 0; j < CPU_KARTS; j++) {
@@ -461,8 +465,9 @@ for(int i = 0;i<OBSTACLES;i++)
        }
 
 	for(int i = 0; i < POWER_UPS; i++) {
-		if(boosts[i].collided(&playerKart)) {
+		if(boosts[i].collided(&playerKart) && !playerKart.getHasBoost()) {
 			boosts[i].setInActive();
+			playerKart.setHasBoost(true);
 			audio->playCue(REV);
 		}
 	}
