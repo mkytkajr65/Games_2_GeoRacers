@@ -25,6 +25,7 @@
 #include "Light.h"
 #include "audio.h"
 #include "PowerUpObject.h"
+#include "TreeSprites.h"
 
 
 class ColoredCubeApp : public D3DApp
@@ -74,6 +75,8 @@ private:
 	ObstacleObject obstacles[OBSTACLES];
 	PowerUpObject boosts[POWER_UPS];
 
+	
+	TreeSprites mTrees;
 	Road road[ROADS];
 	LineObject xLine, yLine, zLine;
 	Light mLight;
@@ -196,12 +199,53 @@ void ColoredCubeApp::initApp()
 
 	float zPos = 0;
 
-	for(int i = 0;i<ROADS;i++)
-	{
-		road[i].init(md3dDevice,1, colors[i]);
-		road[i].setPosition(Vector3(0,-1.2,zPos));
-		zPos += roadZLength;
-	}
+
+	road[0].init(md3dDevice,1,WHITE);
+	road[0].setPosition(Vector3(0, -1.2,zPos));
+	zPos += roadZLength;
+	road[1].init(md3dDevice,1,WHITE);
+	road[1].setPosition(Vector3(0, -1.2,zPos));
+	zPos += roadZLength;
+	road[2].init(md3dDevice,1,WHITE);
+	road[2].setPosition(Vector3(0, -1.2,zPos-3));
+	road[2].setRotYAngle(ToRadian(15));
+	zPos += roadZLength;
+	road[3].init(md3dDevice,1,WHITE);
+	road[3].setPosition(Vector3(23, -1.2,zPos-20));
+	road[3].setRotYAngle(ToRadian(30));
+	
+	road[4].init(md3dDevice,1,WHITE);
+	road[4].setPosition(Vector3(road[3].getPosition().x+20, -1.2, road[3].getPosition().z+40));
+	road[4].setRotYAngle(ToRadian(40));
+	
+	road[5].init(md3dDevice,1,WHITE);
+	road[5].setPosition(Vector3(road[3].getPosition().x+30, -1.2, road[3].getPosition().z+50));
+	road[5].setRotYAngle(ToRadian(40));
+	
+	road[6].init(md3dDevice,1,WHITE);
+	road[6].setPosition(Vector3(road[3].getPosition().x+95, -1.2, road[3].getPosition().z+115));
+
+	
+	road[7].init(md3dDevice,1,WHITE);
+	road[7].setPosition(Vector3(road[6].getPosition().x, -1.2, road[6].getPosition().z+roadZLength));
+	
+	
+	road[8].init(md3dDevice,1,WHITE);
+	road[8].setPosition(Vector3(road[7].getPosition().x, -1.2, road[7].getPosition().z+roadZLength));
+	//road[6].setRotYAngle(ToRadian(40));
+
+	//road[4].init(md3dDevice,1,WHITE);
+	//road[4].setPosition(Vector3(50, -1.2,road[3].getPosition().z+30));
+	//road[4].setRotYAngle(ToRadian(30));
+	////zPos += roadZLength;
+	//road[5].init(md3dDevice,1,WHITE);4
+	//road[5].setPosition(Vector3(90, -1.2,road[4].getPosition().z+70));
+	//road[5].setRotYAngle(ToRadian(140));
+	//road[6].init(md3dDevice,1,WHITE);
+	//road[6].setPosition(Vector3(130, -1.2,road[5].getPosition().z+70));
+	//road[6].setRotYAngle(ToRadian(-40));
+
+	
 	float d = D3DXVec3Dot(&(-mParallelLight.dir), &road[0].getNormal());
 
 	float randZPos, randXPos;
@@ -271,6 +315,24 @@ void ColoredCubeApp::initApp()
 	mLight3.pos = D3DXVECTOR3(playerKart.getPosition().x + .75, playerKart.getPosition().y, playerKart.getPosition().z);*/
 
 	//camera.init(Vector3(playerKart.getPosition().x + 10,playerKart.getPosition().y + 2,playerKart.getPosition().z), Vector3(0,0,0), Vector3(-1,.2,0));
+	
+	
+	D3DXVECTOR3 treeCenters[16];
+	for(UINT i = 0; i < 16; ++i)
+	{
+		float x = RandF(-35.0f, 35.0f);
+		float z = RandF(100.0f, 550.0f);
+		float y = -1.2;
+
+		// Move tree slightly above land height.
+		y += 16.0f;
+
+		treeCenters[i] = D3DXVECTOR3(x,y,z);
+		
+	}
+	mTrees.init(md3dDevice,treeCenters,16);
+
+
 	camera.init(Vector3(0,2,-10), Vector3(0,0,0), Vector3(0,0,10), &playerKart);
 	camera.setPerspective();
 
@@ -315,6 +377,8 @@ void ColoredCubeApp::updateScene(float dt)
 	else if(gameStates == gamePlay)
 	{
 		D3DApp::updateScene(dt);
+
+
 		xLine.update(dt);
 		yLine.update(dt);
 		zLine.update(dt);
@@ -471,6 +535,22 @@ for(int i = 0;i<OBSTACLES;i++)
 	pKart.init(md3dDevice, 1, CHARCOAL_GREY);
 	cKart.init(md3dDevice, 1, RED);
 	obstacle.init(md3dDevice, 1, WHITE);
+
+
+	
+	D3DXVECTOR3 treeCenters[16];
+	for(UINT i = 0; i < 16; ++i)
+	{
+		float x = RandF(100.0f, 350.0f);
+		float z = RandF(100.0f, 350.0f);
+		float y = -1.2;
+
+		// Move tree slightly above land height.
+		y += 16.0f;
+
+		treeCenters[i] = D3DXVECTOR3(x,y,z);
+	}
+	mTrees.init(md3dDevice,treeCenters,16);
 
 	playerKart.init(&pKart, 2, Vector3(0,0,0),Vector3(0,0,0),0,1);
 
@@ -629,6 +709,9 @@ void ColoredCubeApp::drawScene()
 			D3D10_TECHNIQUE_DESC techDesc;
 			mTech->GetDesc(&techDesc);
 
+			mfxDiffuseMapVar->SetResource(mDiffuseMapRV);
+			mfxSpecMapVar->SetResource(mSpecMapRV);
+
 			for(int i = 0;i<ROADS;i++)
 			{
 				mWVP = road[i].getWorld()*mView*mProj;
@@ -701,6 +784,11 @@ void ColoredCubeApp::drawScene()
 			}
 			playerPositionText = outs.str();
 
+			//bills
+				// Draw tree sprites, which use their own fx.
+		
+			mTrees.draw(mParallelLight, camera.getPosition(), mView*mProj);
+		md3dDevice->RSSetState(0); // restore default
 
 			// We specify DT_NOCLIP, so we do not care about width/height of the rect.
 			RECT playerPos = {mClientWidth-85, 10, mClientWidth, mClientHeight};
