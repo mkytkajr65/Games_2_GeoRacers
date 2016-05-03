@@ -5,7 +5,7 @@
 CPUKartObject::CPUKartObject()
 {
 	radius = 0;
-	currentSpeed = 10;
+	currentForwardSpeed = 10;
 	active = true;
 	Identity(&world);
 	rotX = 0;
@@ -19,7 +19,7 @@ void CPUKartObject::init(Box *b, float r, Vector3 pos, Vector3 vel, float sp, fl
 	radius = r;
 	position = pos;
 	velocity = vel;
-	currentSpeed = sp;
+	currentForwardSpeed = sp;
 	scale = s;
 	radiusSquared = r*r;
 	rotX = 0;

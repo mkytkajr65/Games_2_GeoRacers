@@ -27,8 +27,8 @@ public:
 	Vector3 getPosition() {return position;}
 	void setVelocity (Vector3 vel) {velocity = vel;}
 	Vector3 getVelocity() {return velocity;}
-	void setSpeed(float s) {currentSpeed = s;}
-	float getSpeed() {return currentSpeed;}
+	void setSpeed(float s) {currentForwardSpeed = s;}
+	float getSpeed() {return currentForwardSpeed;}
 	void setRadius(float r) {radius = r; radiusSquared = (scale*r)*(scale*r);}
 	float getRadiusSquare() {return radiusSquared;}
 	float getRadius() {return radius;}
@@ -46,6 +46,7 @@ public:
 	void setRotationZ(float r) {rotZ = r;}
 	void setAlreadyCollided(bool ac) {alreadyCollided = ac;}
 	bool getAlreadyCollided() {return alreadyCollided;}
+	void setHasBoost(bool hasBoost){this->hasBoost = hasBoost;};
 
 	//define setWorldMatrix here
 	void setWorldMatrix(Matrix w) {world = w;}
@@ -54,9 +55,12 @@ protected:
 	Box *box; 
 	bool alreadyCollided;
 	Vector3 position;
+	bool isJumping;
+	bool startOfJump;
 	Vector3 velocity;
 	float currentPlayerAcceleration;
-	float currentSpeed;
+	float currentForwardSpeed;
+	float currentUpwardSpeed;
 	float radius;
 	float radiusSquared;
 	bool active;
@@ -65,6 +69,8 @@ protected:
 	ID3D10EffectTechnique* mTech;
 	float rotX, rotY, rotZ;
 	char typeOfCar;
+	bool isBoosting;
+	bool hasBoost;
 };
 
 
