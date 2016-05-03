@@ -563,12 +563,38 @@ for(int i = 0;i<OBSTACLES;i++)
 
 	float zPos = 0;
 
-	for(int i = 0;i<ROADS;i++)
-	{
-		road[i].init(md3dDevice,1, colors[i]);
-		road[i].setPosition(Vector3(0,-1.2,zPos));
-		zPos += roadZLength;
-	}
+	road[0].init(md3dDevice,1,WHITE);
+	road[0].setPosition(Vector3(0, -1.2,zPos));
+	zPos += roadZLength;
+	road[1].init(md3dDevice,1,WHITE);
+	road[1].setPosition(Vector3(0, -1.2,zPos));
+	zPos += roadZLength;
+	road[2].init(md3dDevice,1,WHITE);
+	road[2].setPosition(Vector3(0, -1.2,zPos-3));
+	road[2].setRotYAngle(ToRadian(15));
+	zPos += roadZLength;
+	road[3].init(md3dDevice,1,WHITE);
+	road[3].setPosition(Vector3(23, -1.2,zPos-20));
+	road[3].setRotYAngle(ToRadian(30));
+	
+	road[4].init(md3dDevice,1,WHITE);
+	road[4].setPosition(Vector3(road[3].getPosition().x+20, -1.2, road[3].getPosition().z+40));
+	road[4].setRotYAngle(ToRadian(40));
+	
+	road[5].init(md3dDevice,1,WHITE);
+	road[5].setPosition(Vector3(road[3].getPosition().x+30, -1.2, road[3].getPosition().z+50));
+	road[5].setRotYAngle(ToRadian(40));
+	
+	road[6].init(md3dDevice,1,WHITE);
+	road[6].setPosition(Vector3(road[3].getPosition().x+95, -1.2, road[3].getPosition().z+115));
+
+	
+	road[7].init(md3dDevice,1,WHITE);
+	road[7].setPosition(Vector3(road[6].getPosition().x, -1.2, road[6].getPosition().z+roadZLength));
+	
+	
+	road[8].init(md3dDevice,1,WHITE);
+	road[8].setPosition(Vector3(road[7].getPosition().x, -1.2, road[7].getPosition().z+roadZLength));
 
 	float randZPos, randXPos;
 
