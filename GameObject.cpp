@@ -170,19 +170,6 @@ void GameObject::update(float dt)
 
 	Transform(&effectiveVelocity, &temp,&m);
 
-	/*velocity.z += (currentPlayerAcceleration * cos(ToRadian(rotY)));
-	velocity.x += (currentPlayerAcceleration * sin(ToRadian(rotY)));*/
-
-	//if((velocity.z < 0 && (degrees > -90.0f && degrees < 90.0f)) || (velocity.z > 0 && (degrees < -90.0f && degrees > 90.0f))   && acceleration==0){ velocity.z = 0; }
-
-	
-
-	/*if(effectiveVelocity.z > PLAYER_MAX_VELOCITY){
-		effectiveVelocity.z = PLAYER_MAX_VELOCITY ;
-	}else if(effectiveVelocity.z < -PLAYER_MAX_VELOCITY){
-		effectiveVelocity.z = -PLAYER_MAX_VELOCITY ;
-	}*/
-
 	velocity = effectiveVelocity;
 
 	position += effectiveVelocity*dt;

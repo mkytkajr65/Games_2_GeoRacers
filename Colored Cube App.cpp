@@ -199,8 +199,38 @@ void ColoredCubeApp::initApp()
 
 	float zPos = 0;
 
+	float angle = 15.0f;
 
-	road[0].init(md3dDevice,1,WHITE);
+	/*for(int i = 0;i<ROADS;i++){
+		road[i].init(md3dDevice,1,WHITE);
+
+		Vector3 temp1 = Vector3(0,0,100);
+
+		Matrix m1;
+
+		Identity(&m1);
+		RotateY(&m1, ToRadian(angle));
+
+		Vector3 eV;
+
+		Transform(&eV, &temp1,&m1);
+
+
+		if(i>0){
+			Vector3 newPosition = road[i-1].getPosition() +  eV;
+			road[i].setPosition(newPosition);
+		}else{
+			road[i].setPosition(Vector3(0, -1.2,0));
+		}
+
+		road[i].setRotYAngle(ToRadian(angle));
+
+		//zPos += roadZLength;
+		//angle += 15;
+	}*/
+
+
+	/*road[0].init(md3dDevice,1,WHITE);
 	road[0].setPosition(Vector3(0, -1.2,zPos));
 	zPos += roadZLength;
 	road[1].init(md3dDevice,1,WHITE);
@@ -231,7 +261,7 @@ void ColoredCubeApp::initApp()
 	
 	
 	road[8].init(md3dDevice,1,WHITE);
-	road[8].setPosition(Vector3(road[7].getPosition().x, -1.2, road[7].getPosition().z+roadZLength));
+	road[8].setPosition(Vector3(road[7].getPosition().x, -1.2, road[7].getPosition().z+roadZLength));*/
 	//road[6].setRotYAngle(ToRadian(40));
 
 	//road[4].init(md3dDevice,1,WHITE);
@@ -244,6 +274,14 @@ void ColoredCubeApp::initApp()
 	//road[6].init(md3dDevice,1,WHITE);
 	//road[6].setPosition(Vector3(130, -1.2,road[5].getPosition().z+70));
 	//road[6].setRotYAngle(ToRadian(-40));
+
+
+	for(int i = 0;i<ROADS;i++)
+	{
+		road[i].init(md3dDevice,1, colors[i]);
+		road[i].setPosition(Vector3(0,-1.2,zPos));
+		zPos += roadZLength;
+	}
 
 	
 	float d = D3DXVec3Dot(&(-mParallelLight.dir), &road[0].getNormal());

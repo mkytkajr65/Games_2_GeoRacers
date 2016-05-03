@@ -14,7 +14,7 @@
 #define ToDegree D3DXToDegree
 #define Transform D3DXVec3TransformCoord
 
-const int ROADS = 9;
+const int ROADS = 5;
 const int OBSTACLES = 20;
 const int CPU_KARTS = 3;
 const int POWER_UPS = 8;
