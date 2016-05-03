@@ -4,7 +4,7 @@
 GameObject::GameObject()
 {
 	radius = 0;
-	currentSpeed = 10;
+	currentForwardSpeed = 10;
 	active = true;
 	Identity(&world);
 	rotX = 0;
@@ -48,7 +48,7 @@ void GameObject::init(Box *b, float r, Vector3 pos, Vector3 vel, float sp, float
 	radius = r;
 	position = pos;
 	velocity = vel;
-	currentSpeed = sp;
+	currentForwardSpeed = sp;
 	scale = s;
 	radiusSquared = r*r;
 	rotX = 0;
@@ -57,6 +57,11 @@ void GameObject::init(Box *b, float r, Vector3 pos, Vector3 vel, float sp, float
 	alreadyCollided = false;
 	typeOfCar = 'p';
 	currentPlayerAcceleration = 0.0f;
+	currentUpwardSpeed = 0;
+	isJumping = false;
+	startOfJump = false;
+	hasBoost = true;//to change to false
+	isBoosting = false;
 }
 
 void GameObject::update(float dt)
@@ -64,8 +69,29 @@ void GameObject::update(float dt)
 
 	//float acceleration = -0.13;
 
+	if(isJumping && position.y <= 0.0f)
+	{
+		position.y = 0.0f;
+		currentUpwardSpeed = 0.0f;
+		isJumping = false;
+	}
+
 	float frameAcceleration = 0.0f;
 
+	if(GetAsyncKeyState(VK_SPACE) & 0x8000){
+		if(!isJumping)
+		{
+			isJumping = true;
+			startOfJump = true;
+		}
+	}
+	if(GetAsyncKeyState('B') & 0x8000){
+		if(hasBoost && !isBoosting)
+		{
+			isBoosting = true;
+			hasBoost = false;
+		}
+	}
 	if(GetAsyncKeyState('A') & 0x8000){
 		rotY -= 0.02;
 	}
@@ -80,15 +106,15 @@ void GameObject::update(float dt)
 	}
 
 	//if no acceleration keys are pressed and current speed is close to 0, stop the Kart
-	if((currentSpeed <= 0.3f && currentSpeed >= -0.3f) && frameAcceleration == 0.0f){
-		currentSpeed = 0.0f;
+	if((currentForwardSpeed <= 0.3f && currentForwardSpeed >= -0.3f) && frameAcceleration == 0.0f){
+		currentForwardSpeed = 0.0f;
 	}
 	//if no acceleration keys are pressed and speed is above threshold, then decelerate
-	else if(frameAcceleration == 0.0f && currentSpeed > 0.3f){
+	else if(frameAcceleration == 0.0f && currentForwardSpeed > 0.3f){
 		frameAcceleration = -0.4f;
 	}
 	//if no acceleration keys are pressed and speed is below threshold, then accelerate
-	else if(frameAcceleration == 0.0f && currentSpeed < -0.3f){
+	else if(frameAcceleration == 0.0f && currentForwardSpeed < -0.3f){
 		frameAcceleration = 0.4f;
 	}
 
@@ -99,17 +125,33 @@ void GameObject::update(float dt)
 	}else if(currentPlayerAcceleration<-PLAYER_MAX_ACCELERATION){
 		currentPlayerAcceleration = -PLAYER_MAX_ACCELERATION;
 	}
-	
-	_RPT1(0,"  current speed %f\n",currentSpeed);
 
-	currentSpeed += currentPlayerAcceleration;
-	if(currentSpeed > PLAYER_MAX_VELOCITY){
-		currentSpeed = PLAYER_MAX_VELOCITY ;
-	}else if(currentSpeed < -PLAYER_MAX_VELOCITY){
-		currentSpeed = -PLAYER_MAX_VELOCITY ;
+	if(isJumping && startOfJump)
+	{
+		currentUpwardSpeed = INITIAL_PLAYER_JUMP_VELOCITY;
+		startOfJump = false;
+	}
+	else if(isJumping)
+	{
+		currentUpwardSpeed -= GRAVITY;
 	}
 
-	Vector3 temp = Vector3(0,0,currentSpeed);
+	currentForwardSpeed += currentPlayerAcceleration;
+	if(!isBoosting){
+		if(currentForwardSpeed > PLAYER_MAX_VELOCITY){
+			currentForwardSpeed = PLAYER_MAX_VELOCITY ;
+		}else if(currentForwardSpeed < -PLAYER_MAX_VELOCITY){
+			currentForwardSpeed = -PLAYER_MAX_VELOCITY ;
+		}
+	}
+	else
+	{
+		currentForwardSpeed += BOOST_ACCELERATION_BONUS;
+	}
+
+	_RPT1(0,"  current speed %f\n",currentForwardSpeed);
+
+	Vector3 temp = Vector3(0,currentUpwardSpeed,currentForwardSpeed);
 
 	Matrix m;
 	RotateY(&m, ToRadian(rotY));
@@ -125,11 +167,11 @@ void GameObject::update(float dt)
 
 	
 
-	if(effectiveVelocity.z > PLAYER_MAX_VELOCITY){
+	/*if(effectiveVelocity.z > PLAYER_MAX_VELOCITY){
 		effectiveVelocity.z = PLAYER_MAX_VELOCITY ;
 	}else if(effectiveVelocity.z < -PLAYER_MAX_VELOCITY){
 		effectiveVelocity.z = -PLAYER_MAX_VELOCITY ;
-	}
+	}*/
 
 	velocity = effectiveVelocity;
 

@@ -22,6 +22,7 @@ public:
 	void setRotZAngle(float angle) {rotZ = angle;}
 	void setPosition(Vector3 pos) {position = pos;}
 	Vector3 getPosition() {return position;}
+	Vector3 getNormal() {return norm;}
 
 private:
 	DWORD mNumVertices;
@@ -30,6 +31,7 @@ private:
 	ID3D10Device* md3dDevice;
 	ID3D10Buffer* mVB;
 	ID3D10Buffer* mIB;
+	D3DXVECTOR3 norm;
 
 	float rotX, rotY, rotZ;
 	Matrix world;
