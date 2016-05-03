@@ -108,10 +108,10 @@ void GameObject::update(float dt)
 			}
 		}
 		if(GetAsyncKeyState('A') & 0x8000){
-			rotY -= 0.02;
+			rotY -= 0.07;
 		}
 		if(GetAsyncKeyState('D') & 0x8000){
-			rotY += 0.02;
+			rotY += 0.07;
 		}
 		if(GetAsyncKeyState('W') & 0x8000){
 			frameAcceleration = 1.0;
@@ -164,8 +164,6 @@ void GameObject::update(float dt)
 			currentForwardSpeed = BOOST_VELOCITY;
 		}
 
-		_RPT1(0,"  current speed %f\n",currentForwardSpeed);
-
 		Vector3 temp = Vector3(0,currentUpwardSpeed,currentForwardSpeed);
 
 		Matrix m;
@@ -189,6 +187,8 @@ void GameObject::update(float dt)
 		}*/
 
 		velocity = effectiveVelocity;
+
+		//_RPT1(0,"  current speed %f\n",effectiveVelocity.z);
 
 		position += effectiveVelocity*dt;
 		Matrix rotXM, rotYM, rotZM, transM;

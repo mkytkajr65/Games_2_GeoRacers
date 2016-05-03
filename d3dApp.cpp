@@ -215,7 +215,8 @@ void D3DApp::updateScene(float dt)
 	{
 		float fps = (float)frameCnt; // fps = frameCnt / 1
 		float mspf = 1000.0f / fps;
-
+		_RPT1(0,"  fps %f\n",fps);
+	
 		std::wostringstream outs;   
 		outs.precision(6);
 		outs << L"FPS: " << fps << L"\n" 

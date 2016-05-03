@@ -14,7 +14,7 @@
 #define ToDegree D3DXToDegree
 #define Transform D3DXVec3TransformCoord
 
-const int ROADS = 5;
+const int ROADS = 360;
 const int OBSTACLES = 20;
 const int CPU_KARTS = 3;
 const int POWER_UPS = 8;
@@ -27,13 +27,13 @@ const char REV[] = "Rev";
 const char SQUEAL[] = "Squeal";
 const char CIRCUIT[] = "Circuit";
 const float PLAYER_MAX_ACCELERATION = 0.07f;
-const float PLAYER_MAX_VELOCITY = 50.0f;
+const float PLAYER_MAX_VELOCITY = 100.0f;
 const float INITIAL_PLAYER_JUMP_VELOCITY = 30.0f;
 const float GRAVITY = 0.1f;
-const float ROAD_WIDTH = 20.0f;
-const float ROAD_LENGTH = 100.0f;
-const float BOOST_VELOCITY = 100.0f;
-const float MAX_BOOST_TIME = 2.0f;
+const float ROAD_WIDTH = 50.0f;
+const float ROAD_LENGTH = 50.0f;
+const float BOOST_VELOCITY = 200.0f;
+const float MAX_BOOST_TIME = 3.0f;
 
 enum GameStates {gameMenu, gamePlay, endGame};
 

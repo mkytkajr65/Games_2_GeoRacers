@@ -17,9 +17,6 @@ public:
 	void setWorld(Matrix w) {world = w;}
 	Matrix getWorld() {return world;}
 	void update(float dt);
-	void setRotXAngle(float angle) {rotX = angle;}
-	void setRotYAngle(float angle) {rotY = angle;}
-	void setRotZAngle(float angle) {rotZ = angle;}
 	void setPosition(Vector3 pos) {position = pos;}
 	Vector3 getPosition() {return position;}
 	Vector3 getNormal() {return norm;}
