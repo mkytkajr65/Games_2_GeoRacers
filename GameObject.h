@@ -47,6 +47,9 @@ public:
 	void setAlreadyCollided(bool ac) {alreadyCollided = ac;}
 	bool getAlreadyCollided() {return alreadyCollided;}
 	void setHasBoost(bool hasBoost){this->hasBoost = hasBoost;};
+	bool getHasBoost() {return hasBoost;}
+	void setCObjType(char x) {cObjType = x;}
+	char getObjType() {return objType;}
 
 	//define setWorldMatrix here
 	void setWorldMatrix(Matrix w) {world = w;}
@@ -55,6 +58,7 @@ protected:
 	Box *box; 
 	bool alreadyCollided;
 	Vector3 position;
+	char objType;
 	bool isJumping;
 	bool startOfJump;
 	Vector3 velocity;
@@ -72,6 +76,7 @@ protected:
 	bool isBoosting;
 	float currentBoostTime;
 	bool hasBoost;
+	char cObjType;
 };
 
 

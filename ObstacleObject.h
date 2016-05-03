@@ -38,6 +38,7 @@ public:
 	void setRotationX(float r) {rotX = r;}
 	void setRotationY(float r) {rotY = r;}
 	void setRotationZ(float r) {rotZ = r;}
+	char getObjType() {return objType;}
 
 	//define setWorldMatrix here
 	void setWorldMatrix(Matrix w) {world = w;}
@@ -50,6 +51,7 @@ private:
 	float speed;
 	float radius;
 	float radiusSquared;
+	char objType;
 	bool active;
 	Matrix world;
 	float scale;

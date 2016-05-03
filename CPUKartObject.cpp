@@ -61,7 +61,9 @@ bool CPUKartObject::collided(ObstacleObject *obstacleObject)
 	Vector3 diff = position - obstacleObject->getPosition();
 	float length = D3DXVec3LengthSq(&diff);
 	float radii = radiusSquared + obstacleObject->getRadiusSquare();
-	if (length <= radii)
+	if (length <= radii) {
+		velocity = velocity/2;
 		return true;
+	}
 	return false;
 }

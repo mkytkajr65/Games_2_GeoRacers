@@ -10,6 +10,7 @@ ObstacleObject::ObstacleObject()
 	rotX = 0;
 	rotY = 0;
 	rotZ = 0;
+	objType = 'O';
 }
 
 ObstacleObject::~ObstacleObject()
