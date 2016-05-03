@@ -55,6 +55,7 @@ private:
 	ID3D10ShaderResourceView* mDiffuseMapRV;
 	ID3D10ShaderResourceView* mSpecMapRV;
 	ID3D10ShaderResourceView* boxTexVar;
+	ID3D10ShaderResourceView* boostTexVar;
 	ID3D10ShaderResourceView* carTexVar;
 	ID3D10ShaderResourceView* splashTex;
 
@@ -163,6 +164,8 @@ void ColoredCubeApp::initApp()
 		L"../Games_2_GeoRacers/defaultspec.dds", 0, 0, &mSpecMapRV, 0 ));
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
 		L"../Games_2_GeoRacers/box.png", 0, 0, &boxTexVar, 0 ));
+	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
+		L"../Games_2_GeoRacers/boost.png", 0, 0, &boostTexVar, 0 ));
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
 		L"../Games_2_GeoRacers/stripe.png", 0, 0, &carTexVar, 0 ));
 
@@ -514,6 +517,8 @@ for(int i = 0;i<OBSTACLES;i++)
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
 		L"../Games_2_GeoRacers/box.png", 0, 0, &boxTexVar, 0 ));
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
+		L"../Games_2_GeoRacers/boost.png", 0, 0, &boostTexVar, 0 ));
+	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
 		L"../Games_2_GeoRacers/stripe.png", 0, 0, &carTexVar, 0 ));
 
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
@@ -741,7 +746,8 @@ void ColoredCubeApp::drawScene()
 				obstacles[i].setMTech(mTech);
 				obstacles[i].draw();
 			}
-
+			mfxDiffuseMapVar->SetResource(boostTexVar);
+			mfxSpecMapVar->SetResource(mSpecMapRV);
 			for(int i = 0; i < POWER_UPS; i++)
 			{
 				mWVP = boosts[i].getWorldMatrix()*mView*mProj;

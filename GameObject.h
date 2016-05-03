@@ -70,6 +70,7 @@ protected:
 	float rotX, rotY, rotZ;
 	char typeOfCar;
 	bool isBoosting;
+	float currentBoostTime;
 	bool hasBoost;
 };
 

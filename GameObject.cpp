@@ -62,12 +62,22 @@ void GameObject::init(Box *b, float r, Vector3 pos, Vector3 vel, float sp, float
 	startOfJump = false;
 	hasBoost = true;//to change to false
 	isBoosting = false;
+	currentBoostTime = 0.0;
 }
 
 void GameObject::update(float dt)
 {	
-
-	//float acceleration = -0.13;
+	if(isBoosting)
+	{
+		if(currentBoostTime < MAX_BOOST_TIME)
+		{
+			currentBoostTime += dt;
+		}else{
+			isBoosting = false;
+			currentForwardSpeed = PLAYER_MAX_VELOCITY;
+		}
+	}
+	
 
 	if(isJumping && position.y <= 0.0f)
 	{
@@ -146,7 +156,7 @@ void GameObject::update(float dt)
 	}
 	else
 	{
-		currentForwardSpeed += BOOST_ACCELERATION_BONUS;
+		currentForwardSpeed = BOOST_VELOCITY;
 	}
 
 	_RPT1(0,"  current speed %f\n",currentForwardSpeed);
