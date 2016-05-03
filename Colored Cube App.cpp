@@ -252,40 +252,11 @@ void ColoredCubeApp::initApp()
 
 	float roadXLength = 20;
 
-	float randTranslate;
+	float horOffset, fbOffset;
 
 	for(int i = 0; i < OBSTACLES; i++) {
-		obstacles[i].init(&obstacle,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
-
-			/*randZPos = ((int)totalRoadZLength - 25) * ( (double)rand() / (double)RAND_MAX ) + 25;
-			randXPos = (rand() % (int)roadXLength)-10;*/
-			randTranslate = ((int)45 - 20) * ( (double)rand() / (double)RAND_MAX ) + 20;
-
-			Vector3 temp1 = Vector3(0,0,randTranslate);
-
-			Matrix m1;
-
-			Identity(&m1);
-			RotateY(&m1, ToRadian(angle));
-
-			Vector3 eV;
-
-			Transform(&eV, &temp1,&m1);
-
-
-			if(i>0){
-			Vector3 newPosition = obstacles[i-1].getPosition() +  eV;
-			obstacles[i].setPosition(newPosition);
-			}else{
-			obstacles[i].setPosition(Vector3(0, -1.2,0));
-			}
-
-			obstacles[i].setRotationY(ToRadian(angle));
-
-			//zPos += roadZLength;
-			angle += 1;
-
-		//obstacles[i].setPosition(Vector3(randXPos, -1.2, randZPos));
+			obstacles[i].init(&obstacle,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
+			obstacles[i].setPosition(roads[i].getPosition());
 	}
 
 
