@@ -86,7 +86,7 @@ void TreeSprites::buildFX()
   
 	ID3D10Blob* compilationErrors = 0;
 	HRESULT hr = 0;
-	hr = D3DX10CreateEffectFromFile(L"../Games_2_GeoRacers2/tree.fx", 0, 0, 
+	hr = D3DX10CreateEffectFromFile(L"../Games_2_GeoRacers/tree.fx", 0, 0, 
 		"fx_4_0", shaderFlags, 0, md3dDevice, 0, 0, &mFX, &compilationErrors, 0);
 	if(FAILED(hr))
 	{
@@ -133,10 +133,10 @@ void TreeSprites::buildShaderResourceView()
 
 	std::wstring filenames[4] = 
 	{
-		L"../Games_2_GeoRacers2/stars.png",
-		L"../Games_2_GeoRacers2/stars2.png",
-		L"../Games_2_GeoRacers2/stars2.png",
-		L"../Games_2_GeoRacers2/stars.png"
+		L"../Games_2_GeoRacers/stars.png",
+		L"../Games_2_GeoRacers/stars2.png",
+		L"../Games_2_GeoRacers/stars2.png",
+		L"../Games_2_GeoRacers/stars.png"
 	};
 
 	ID3D10Texture2D* srcTex[4];
