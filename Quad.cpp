@@ -28,10 +28,10 @@ void Quad::init(ID3D10Device* device, float scale, D3DXCOLOR c)
 
 	 Vertex vertices[] =
     {
-		{D3DXVECTOR3(-1.0f, 0.0f, 0.0f), c},
-		{D3DXVECTOR3(1.0f, 0.0f, 0.0f), c},
-		{D3DXVECTOR3(0.0f, 0.0f, -1.0f), c},
-		{D3DXVECTOR3(0.0f, 0.0f, 1.0f), c}
+		{D3DXVECTOR3(-1.0f, 0.0f, 0.0f),D3DXVECTOR3(0, 1, 0), c, WHITE, D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(1.0f, 0.0f, 0.0f), D3DXVECTOR3(0, 1, 0), c, WHITE, D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(0.0f, 0.0f, -1.0f),D3DXVECTOR3(0, 1, 0), c, WHITE, D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(0.0f, 0.0f, 1.0f), D3DXVECTOR3(0, 1, 0), c, WHITE, D3DXVECTOR2(0, 0)}
     };
 
 	// Scale the Quad.

@@ -27,8 +27,8 @@ void Line::init(ID3D10Device* device, float scale, D3DXCOLOR c)
 	// Create vertex buffer
     Vertex vertices[] =
     {
-		{D3DXVECTOR3(0.0f, 0.0f, 0.0f), c},
-		{D3DXVECTOR3(2.0f, 0.0f, 0.0f), c}
+		{D3DXVECTOR3(0.0f, 0.0f, 0.0f),D3DXVECTOR3(0, 0, 0), c, WHITE, D3DXVECTOR2(0,0)},
+		{D3DXVECTOR3(2.0f, 0.0f, 0.0f),D3DXVECTOR3(0, 0, 0), c, WHITE, D3DXVECTOR2(0,0)}
     };
 
 

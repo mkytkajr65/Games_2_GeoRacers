@@ -80,6 +80,7 @@ private:
 	TreeSprites mTrees;
 	Road road;
 	RoadObject roads[ROADS];
+	D3DXVECTOR3 waypoints[ROADS];
 	LineObject xLine, yLine, zLine;
 	Light mLight;
 	Audio *audio;
@@ -109,6 +110,7 @@ private:
 	float boostTimer;
 	float mTheta;
 	float mPhi;
+	int w[CPU_KARTS];
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
@@ -234,6 +236,7 @@ void ColoredCubeApp::initApp()
 
 		//zPos += roadZLength;
 		angle += 1;
+		waypoints[i] = roads[i].getPosition();
 	}
 
 	/*for(int i = 0;i<ROADS;i++)
@@ -272,12 +275,14 @@ void ColoredCubeApp::initApp()
 	int maxVelocity = PLAYER_MAX_VELOCITY;
 
 	for(int i = 0; i < CPU_KARTS; i++) {
+		w[i] = 0;
 		randVelocity  = rand() % maxVelocity + 5;
 		if(randVelocity > PLAYER_MAX_VELOCITY)
 			randVelocity = PLAYER_MAX_VELOCITY - 1;
 		else if(randVelocity < PLAYER_MAX_VELOCITY*.75)
 			randVelocity = PLAYER_MAX_VELOCITY*.75;
 		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(0,0,randVelocity),0,1);
+		CPUKarts[i].setCurrentWayPoint(Vector3(waypoints[w[i]].x + ((rand()%40)-20), waypoints[w[i]].y, waypoints[w[i]].z + ((rand()%40)-20)));
 		if (i==0) {
 			CPUKarts[i].setPosition(Vector3(playerKart.getPosition().x + 1.5, 0,playerKart.getPosition().z + 2));
 		}
@@ -384,12 +389,10 @@ void ColoredCubeApp::updateScene(float dt)
 		playerKart.update(dt);
 
 		camera.update(dt);
-
-
-		for(int i = 0;i<CPU_KARTS;i++)
-		{
+		for(int i = 0; i < CPU_KARTS; i++) {
 			CPUKarts[i].update(dt);
 		}
+		
 
 		/*for (int i = 0; i < CPU_KARTS; i++) {
 		float oldCPUVel = CPUKarts[i].getVelocity().z;
@@ -462,6 +465,15 @@ void ColoredCubeApp::updateScene(float dt)
 		}
 		}*/
 
+		for(int i = 0; i < CPU_KARTS; i++) {
+			if(CPUKarts[i].getPosition().z >= waypoints[w[i]].z -20 && CPUKarts[i].getPosition().x >= waypoints[w[i]].x-20 && CPUKarts[i].getPosition().z <= waypoints[w[i]].z +20 && CPUKarts[i].getPosition().x <= waypoints[w[i]].x+20) {
+				w[i] = w[i] + 1;
+				if(w[i] == ROADS)
+					w[i] = 0;
+				CPUKarts[i].setCurrentWayPoint(Vector3(waypoints[w[i]].x + ((rand()%10)-5), waypoints[w[i]].y, waypoints[w[i]].z + ((rand()%10)-5)));
+			}
+		}
+
 		for(int i = 0; i < POWER_UPS; i++) {
 			if(boosts[i].collided(&playerKart) && !playerKart.getHasBoost()) {
 				boosts[i].setInActive();
@@ -509,8 +521,8 @@ void ColoredCubeApp::updateScene(float dt)
 			//mCarMesh.init(md3dDevice, 1.0f);
 
 			mParallelLight.dir      = D3DXVECTOR3(0.57735f, -0.57735f, 0.57735f);
-			mParallelLight.ambient  = D3DXCOLOR(0.4f, 0.4f, 0.4f, 1.0f);
-			mParallelLight.diffuse  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+			mParallelLight.ambient  = D3DXCOLOR(0.8f, 0.4f, 0.4f, 1.0f);
+			mParallelLight.diffuse  = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
 			mParallelLight.specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 			HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
