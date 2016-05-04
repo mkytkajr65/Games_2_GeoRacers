@@ -49,6 +49,7 @@ D3DApp::D3DApp(HINSTANCE hInstance)
 	mRenderTargetView   = 0;
 	mDepthStencilView   = 0;
 	mFont               = 0;
+	smallFont = 0;
 
 	mMainWndCaption = L"Geo Racer";
 	md3dDriverType  = D3D10_DRIVER_TYPE_HARDWARE;
@@ -65,6 +66,7 @@ D3DApp::~D3DApp()
 	ReleaseCOM(mDepthStencilBuffer);
 	ReleaseCOM(md3dDevice);
 	ReleaseCOM(mFont);
+	ReleaseCOM(smallFont);
 }
 
 HINSTANCE D3DApp::getAppInst()
@@ -138,9 +140,21 @@ void D3DApp::initApp()
     fontDesc.OutputPrecision = OUT_DEFAULT_PRECIS;
     fontDesc.Quality         = DEFAULT_QUALITY;
     fontDesc.PitchAndFamily  = DEFAULT_PITCH | FF_DONTCARE;
-    wcscpy(fontDesc.FaceName, L"Times New Roman");
+    wcscpy(fontDesc.FaceName, L"Arial");
 
 	D3DX10CreateFontIndirect(md3dDevice, &fontDesc, &mFont);
+	
+	fontDesc.Height          = 40;
+    fontDesc.Width           = 0;
+    fontDesc.Weight          = 0;
+    fontDesc.MipLevels       = 1;
+    fontDesc.Italic          = false;
+    fontDesc.CharSet         = DEFAULT_CHARSET;
+    fontDesc.OutputPrecision = OUT_DEFAULT_PRECIS;
+    fontDesc.Quality         = DEFAULT_QUALITY;
+    fontDesc.PitchAndFamily  = DEFAULT_PITCH | FF_DONTCARE;
+    wcscpy(fontDesc.FaceName, L"Arial");
+	D3DX10CreateFontIndirect(md3dDevice, &fontDesc, &smallFont);
 }
  
 void D3DApp::onResize()
