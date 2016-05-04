@@ -16,8 +16,13 @@ public:
 	bool collided(GameObject *gameObject);
 	bool collided(ObstacleObject *obstacleObject);
 	char type(){return typeOfCar;};
+	Vector3 getCurrentWayPoint() {return currentWayPoint;}
+	void setCurrentWayPoint(Vector3 w) {currentWayPoint = w;}
 
 	void init(Box *b, float r, Vector3 pos, Vector3 vel, float sp, float s);
+
+private:
+	Vector3 currentWayPoint;
 };
 
 

@@ -30,7 +30,8 @@ Texture2D gSpecMap;
 SamplerState gTriLinearSam
 {
 	Filter = MIN_MAG_MIP_LINEAR;
-	
+	AddressU = WRAP;
+	AddressV = WRAP;
 };
 
 struct VS_IN

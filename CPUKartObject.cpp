@@ -19,7 +19,7 @@ void CPUKartObject::init(Box *b, float r, Vector3 pos, Vector3 vel, float sp, fl
 	radius = r;
 	position = pos;
 	velocity = vel;
-	currentForwardSpeed = sp;
+	currentForwardSpeed = vel.z;
 	scale = s;
 	radiusSquared = r*r;
 	rotX = 0;
@@ -27,6 +27,7 @@ void CPUKartObject::init(Box *b, float r, Vector3 pos, Vector3 vel, float sp, fl
 	rotZ = 0;
 	alreadyCollided = false;
 	typeOfCar = 'c';
+	currentWayPoint = Vector3(0, 0, 0);
 }
 
 CPUKartObject::~CPUKartObject()
@@ -37,6 +38,9 @@ CPUKartObject::~CPUKartObject()
 void CPUKartObject::update(float dt)
 {
 	//_RPT1(0, "Rand Velocity %f \n", velocity.z);
+	Vector3 direction = currentWayPoint - position;
+	D3DXVec3Normalize(&direction, &direction);
+	velocity = Vector3(currentForwardSpeed*direction.x, 0, currentForwardSpeed*direction.z);
 	Matrix rotXM, rotYM, rotZM, transM;
 	RotateX(&rotXM, rotX);
 	RotateY(&rotYM, rotY);

@@ -50,6 +50,8 @@ public:
 	bool getHasBoost() {return hasBoost;}
 	void setCObjType(char x) {cObjType = x;}
 	char getObjType() {return objType;}
+	void setCurrentWayPoint(Vector3 w) {currentWayPoint = w;}
+	Vector3 getCurrentWayPoint() {return currentWayPoint;}
 
 	//define setWorldMatrix here
 	void setWorldMatrix(Matrix w) {world = w;}
@@ -77,6 +79,7 @@ protected:
 	float currentBoostTime;
 	bool hasBoost;
 	char cObjType;
+	Vector3 currentWayPoint;
 };
 
 

@@ -25,14 +25,14 @@ void Obstacle::init(ID3D10Device* device, float scale, D3DXCOLOR c)
 	// Create vertex buffer
     Vertex vertices[] =
     {
-		{D3DXVECTOR3(-0.5f, 0.0f, -2.0f), c},
-		{D3DXVECTOR3(-0.5f, +5.0f, -2.0f), c},
-		{D3DXVECTOR3(+0.5f, +5.0f, -2.0f), c},
-		{D3DXVECTOR3(+0.5f, 0.0f, -2.0f), c},
-		{D3DXVECTOR3(-0.5f, 0.0f, +2.0f), c},
-		{D3DXVECTOR3(-0.5f, +5.0f, +2.0f), c},
-		{D3DXVECTOR3(+0.5f, +5.0f, +2.0f), c},
-		{D3DXVECTOR3(+0.5f, 0.0f, +2.0f), c},
+		{D3DXVECTOR3(-0.5f, 0.0f, -2.0f), D3DXVECTOR3(0, 0, -1),D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(-0.5f, +5.0f, -2.0f),D3DXVECTOR3(0, 0, -1),D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(+0.5f, +5.0f, -2.0f),D3DXVECTOR3(0, 0, -1),D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(+0.5f, 0.0f, -2.0f), D3DXVECTOR3(0, 0, -1),D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(-0.5f, 0.0f, +2.0f), D3DXVECTOR3(0, 0, -1),D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(-0.5f, +5.0f, +2.0f),D3DXVECTOR3(0, 0, -1),D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(+0.5f, +5.0f, +2.0f),D3DXVECTOR3(0, 0, -1),D3DXVECTOR2(0, 0)},
+		{D3DXVECTOR3(+0.5f, 0.0f, +2.0f), D3DXVECTOR3(0, 0, -1),D3DXVECTOR2(0, 0)}
     };
 
 
