@@ -114,6 +114,7 @@ private:
 	float mTheta;
 	float mPhi;
 	int w[CPU_KARTS+1];
+
 };
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance,
@@ -171,7 +172,7 @@ void ColoredCubeApp::initApp()
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
 		L"../Games_2_GeoRacers/test.png", 0, 0, &mDiffuseMapRV, 0 ));
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
-		L"../Games_2_GeoRacers/templeBase03_spec.dds", 0, 0, &mSpecMapRV, 0 ));
+		L"../Games_2_GeoRacers/defaultspec.dds", 0, 0, &mSpecMapRV, 0 ));
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
 		L"../Games_2_GeoRacers/box.png", 0, 0, &boxTexVar, 0 ));
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
@@ -181,7 +182,7 @@ void ColoredCubeApp::initApp()
 
 	HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
 		L"../Games_2_GeoRacers/WoodCrate01.dds", 0, 0, &splashTex, 0 ));
-	mParallelLight.dir      = D3DXVECTOR3(0.0, -1.0f, 0.0f);
+	mParallelLight.dir      = D3DXVECTOR3(0.0, -.707f, -.707f);
 	mParallelLight.ambient  = D3DXCOLOR(0.4f, 0.4f, 0.5f, 1.0f);
 	mParallelLight.diffuse  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 	mParallelLight.specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
@@ -540,9 +541,9 @@ void ColoredCubeApp::updateScene(float dt)
 			gameStates = gamePlay;
 			//mCarMesh.init(md3dDevice, 1.0f);
 
-			mParallelLight.dir      = D3DXVECTOR3(0.57735f, -0.57735f, 0.57735f);
-			mParallelLight.ambient  = D3DXCOLOR(0.6f, 0.4f, 0.4f, 1.0f);
-			mParallelLight.diffuse  = D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f);
+			mParallelLight.dir      = D3DXVECTOR3(0.0, -.707f, -.707f);
+			mParallelLight.ambient  = D3DXCOLOR(0.4f, 0.4f, 0.5f, 1.0f);
+			mParallelLight.diffuse  = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 			mParallelLight.specular = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 			HR(D3DX10CreateShaderResourceViewFromFile(md3dDevice, 
@@ -564,7 +565,7 @@ void ColoredCubeApp::updateScene(float dt)
 			gameOver = false;
 
 			playerPosition = -1;
-
+			laps = 0;
 			boostTimer = 0;
 
 			pKart.init(md3dDevice, 1, CHARCOAL_GREY);
@@ -891,10 +892,16 @@ void ColoredCubeApp::drawScene()
 
 		std::wostringstream outs;   
 		outs.precision(6);
-		outs << "Geo Racers\n\n\nPress <enter> to begin!";
+		outs << "Geo Racers\n\n\n\n\nPress <enter> to begin!";
 		playerPositionText = outs.str();
 		RECT playerPos = {100, 100, mClientWidth, mClientHeight};
 		mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
+
+		std::wostringstream outs2;   
+		outs.precision(6);
+		outs2 << "\n\nControls:\n-W/S: Accelerate/Decelerate\n-A/D: Left/Right\n-Space: Jump\n-Collect a power up and press B to boost";
+		playerPositionText = outs2.str();
+		smallFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
 
 
 	}
