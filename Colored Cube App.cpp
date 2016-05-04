@@ -803,10 +803,16 @@ void ColoredCubeApp::drawScene()
 
 		std::wostringstream outs;   
 		outs.precision(6);
-		outs << "Geo Racers\n\n\nPress <enter> to begin!";
+		outs << "Geo Racers\n\n\n\n\nPress <enter> to begin!";
 		playerPositionText = outs.str();
 		RECT playerPos = {100, 100, mClientWidth, mClientHeight};
 		mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
+
+		std::wostringstream outs2;   
+		outs.precision(6);
+		outs2 << "\n\nControls:\n-W/S: Accelerate/Decelerate\n-A/D: Left/Right\n-Space: Jump\n-Collect a power up and press B to boost";
+		playerPositionText = outs2.str();
+		smallFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
 
 
 	}
