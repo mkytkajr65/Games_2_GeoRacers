@@ -562,7 +562,7 @@ void ColoredCubeApp::updateScene(float dt)
 				if(w[CPU_KARTS] == ROADS) {
 					laps++;
 					w[CPU_KARTS] = 0;
-					if(laps == 2) {
+					if(laps == 1) {
 						gameOver = true;
 						gameStates = endGame;
 					}
@@ -585,7 +585,7 @@ void ColoredCubeApp::updateScene(float dt)
 				placementCounter++;
 			}
 		}
-		playerPosition = CPU_KARTS - placementCounter;
+		playerPosition = CPU_KARTS - placementCounter+1;
 		if((GetAsyncKeyState('B') & 0x8000) && playerKart.getHasBoost()){
 			audio->playCue(REV);
 		}
