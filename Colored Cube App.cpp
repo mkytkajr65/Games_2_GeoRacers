@@ -569,6 +569,9 @@ void ColoredCubeApp::updateScene(float dt)
 				}
 				playerKart.setCurrentWayPoint(waypoints[w[CPU_KARTS]]);
 			}
+		if(playerKart.getPosition().z <= waypoints[w[CPU_KARTS]-1].z -30 || playerKart.getPosition().x <= waypoints[w[CPU_KARTS]-1].x-30 && playerKart.getPosition().z >= waypoints[w[CPU_KARTS]-1].z +30 && playerKart.getPosition().x >= waypoints[w[CPU_KARTS]-1].x+30) {
+				playerKart.setVelocity(-playerKart.getVelocity()/10);
+			}
 
 		for(int i = 0; i < POWER_UPS; i++) {
 			if(boosts[i].collided(&playerKart) && !playerKart.getHasBoost()) {
@@ -582,7 +585,7 @@ void ColoredCubeApp::updateScene(float dt)
 				placementCounter++;
 			}
 		}
-		playerPosition = 4 - placementCounter;
+		playerPosition = CPU_KARTS - placementCounter;
 		if((GetAsyncKeyState('B') & 0x8000) && playerKart.getHasBoost()){
 			audio->playCue(REV);
 		}
@@ -1008,8 +1011,13 @@ void ColoredCubeApp::drawScene()
 			playerPositionText = outs.str();
 			mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
 			break;
-		case 4:
+		case 6:
 			outs << "FINISH!\nLast Place...\n\nPress <enter> to continue!";
+			playerPositionText = outs.str();
+			mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
+			break;
+		default:
+			outs << "FINISH!\n" << playerPosition << "th Place.\n\nPress <enter> to continue!";
 			playerPositionText = outs.str();
 			mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
 			break;
