@@ -28,12 +28,12 @@ const char REV[] = "Rev";
 const char SQUEAL[] = "Squeal";
 const char CIRCUIT[] = "Circuit";
 const float PLAYER_MAX_ACCELERATION = 0.1f;
-const float PLAYER_MAX_VELOCITY = 200.0f;
+const float PLAYER_MAX_VELOCITY = 160.0f;
 const float INITIAL_PLAYER_JUMP_VELOCITY = 30.0f;
 const float GRAVITY = 0.45f;
 const float ROAD_WIDTH = 50.0f;
 const float ROAD_LENGTH = 50.0f;
-const float BOOST_VELOCITY = 250.0f;
+const float BOOST_VELOCITY = 200.0f;
 const float MAX_BOOST_TIME = 2.5f;
 
 enum GameStates {gameMenu, gamePlay, endGame};

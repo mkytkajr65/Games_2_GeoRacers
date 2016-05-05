@@ -271,17 +271,14 @@ void ColoredCubeApp::initApp()
 
 	for(int i = 0; i < OBSTACLES; i++) {
 			obstacles[i].init(&obstacle,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
-			boosts[i].init(&boostBox,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
 
 			tempPosition = roads[i].getPosition();
 
 			angle = roads[i].getRotationY();
 
 			horOffset = ((int)maxHorOffset - minHorOffset) * ( (double)rand() / (double)RAND_MAX ) + minHorOffset;
-			powOffset = ((int)maxHorOffset - minHorOffset) * ( (double)rand() / (double)RAND_MAX ) + minHorOffset;
 
 			Vector3 temp1 = Vector3(horOffset,0, 0);
-			Vector3 temp2 = Vector3(powOffset, 0, 0);
 
 			Matrix m1;
 
@@ -289,25 +286,19 @@ void ColoredCubeApp::initApp()
 			RotateY(&m1, ToRadian(angle));
 
 			Vector3 eV;
-			Vector3 pV;
 
 			Transform(&eV, &temp1,&m1);
-			Transform(&pV, &temp2, &m1);
 
 
 			if(i>0)
 			{
 				Vector3 newPosition1 = roads[i-1].getPosition() +  eV;
-				Vector3 newPosition2 = roads[i-1].getPosition() + pV;
 				obstacles[i].setPosition(newPosition1);
-				boosts[i].setPosition(newPosition2);
 			}
 			else
 			{
 				obstacles[i].setPosition(roads[i].getPosition() + eV);
-				boosts[i].setPosition(roads[i].getPosition() + pV);
 			}
-			boosts[i].setRotationY(angle);
 			obstacles[i].setRotationY(angle);
 	}
 	
@@ -566,7 +557,7 @@ void ColoredCubeApp::updateScene(float dt)
 			}
 		}
 
-		if(playerKart.getPosition().z >= waypoints[w[CPU_KARTS]].z -20 && playerKart.getPosition().x >= waypoints[w[CPU_KARTS]].x-20 && playerKart.getPosition().z <= waypoints[w[CPU_KARTS]].z +20 && playerKart.getPosition().x <= waypoints[w[CPU_KARTS]].x+20) {
+		if(playerKart.getPosition().z >= waypoints[w[CPU_KARTS]].z -30 && playerKart.getPosition().x >= waypoints[w[CPU_KARTS]].x-30 && playerKart.getPosition().z <= waypoints[w[CPU_KARTS]].z +30 && playerKart.getPosition().x <= waypoints[w[CPU_KARTS]].x+30) {
 				w[CPU_KARTS] = w[CPU_KARTS] + 1;
 				if(w[CPU_KARTS] == ROADS) {
 					laps++;
@@ -710,17 +701,14 @@ void ColoredCubeApp::updateScene(float dt)
 
 			for(int i = 0; i < OBSTACLES; i++) {
 				obstacles[i].init(&obstacle,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
-				boosts[i].init(&boostBox,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
 
 				tempPosition = roads[i].getPosition();
 
 				angle = roads[i].getRotationY();
 
 				horOffset = ((int)maxHorOffset - minHorOffset) * ( (double)rand() / (double)RAND_MAX ) + minHorOffset;
-				powOffset = ((int)maxHorOffset - minHorOffset) * ( (double)rand() / (double)RAND_MAX ) + minHorOffset;
 
 				Vector3 temp1 = Vector3(horOffset,0, 0);
-				Vector3 temp2 = Vector3(powOffset, 0, 0);
 
 				Matrix m1;
 
@@ -728,25 +716,19 @@ void ColoredCubeApp::updateScene(float dt)
 				RotateY(&m1, ToRadian(angle));
 
 				Vector3 eV;
-				Vector3 pV;
 
 				Transform(&eV, &temp1,&m1);
-				Transform(&pV, &temp2, &m1);
 
 
 				if(i>0)
 				{
 					Vector3 newPosition1 = roads[i-1].getPosition() +  eV;
-					Vector3 newPosition2 = roads[i-1].getPosition() + pV;
 					obstacles[i].setPosition(newPosition1);
-					boosts[i].setPosition(newPosition2);
 				}
 				else
 				{
 					obstacles[i].setPosition(roads[i].getPosition() + eV);
-					boosts[i].setPosition(roads[i].getPosition() + pV);
 				}
-				boosts[i].setRotationY(angle);
 				obstacles[i].setRotationY(angle);
 			}
 
@@ -1009,10 +991,29 @@ void ColoredCubeApp::drawScene()
 
 		std::wostringstream outs;   
 		outs.precision(6);
-		outs << "FINISH!\n\n\nPress <enter> to continue!";
-		playerPositionText = outs.str();
 		RECT playerPos = {100, 100, mClientWidth, mClientHeight};
-		mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
+		switch(playerPosition) {
+		case 1:
+			outs << "FINISH!\n" << playerPosition << "st Place!\n\nPress <enter> to continue!";
+			playerPositionText = outs.str();
+			mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
+			break;
+		case 2:
+			outs << "FINISH!\n" << playerPosition << "nd Place!\n\nPress <enter> to continue!";
+			playerPositionText = outs.str();
+			mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
+			break;
+		case 3:
+			outs << "FINISH!\n" << playerPosition << "rd Place.\n\nPress <enter> to continue!";
+			playerPositionText = outs.str();
+			mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
+			break;
+		case 4:
+			outs << "FINISH!\nLast Place...\n\nPress <enter> to continue!";
+			playerPositionText = outs.str();
+			mFont->DrawText(0, playerPositionText.c_str(), -1, &playerPos, DT_NOCLIP, WHITE);
+			break;
+		}
 
 		//	D3DXMATRIX texMtx;
 		//	D3DXMatrixIdentity(&texMtx);
