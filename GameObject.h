@@ -7,6 +7,7 @@
 #include "Box.h"
 #include "constants.h"
 #include "ObstacleObject.h"
+#include "RoadObject.h"
 #include "d3dApp.h"
 
 class GameObject
@@ -41,6 +42,7 @@ public:
 	void setMTech(ID3D10EffectTechnique* m){ mTech = m;}
 	bool collided(GameObject *gameObject);
 	bool collided(ObstacleObject *obstacleObject);
+	bool collided(RoadObject *roadObject);
 	void setRotationX(float r) {rotX = r;}
 	void setRotationY(float r) {rotY = r;}
 	void setRotationZ(float r) {rotZ = r;}

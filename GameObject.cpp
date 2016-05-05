@@ -191,6 +191,7 @@ void GameObject::update(float dt)
 		//_RPT1(0,"  current speed %f\n",effectiveVelocity.z);
 
 		position += effectiveVelocity*dt;
+
 		Matrix rotXM, rotYM, rotZM, transM;
 		RotateX(&rotXM, rotX);
 		RotateY(&rotYM, ToRadian(rotY));
