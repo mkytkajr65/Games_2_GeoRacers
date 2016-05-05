@@ -4,6 +4,7 @@
 
 #include "GameObject.h"
 #include "ObstacleObject.h"
+#include "constants.h"
 
 class CPUKartObject : public GameObject
 {

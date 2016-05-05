@@ -264,9 +264,43 @@ void ColoredCubeApp::initApp()
 
 	float horOffset, fbOffset;
 
+	Vector3 tempPosition;
+
+	float maxHorOffset = ROAD_WIDTH/2;
+	float minHorOffset = -ROAD_WIDTH/2;
+
 	for(int i = 0; i < OBSTACLES; i++) {
 			obstacles[i].init(&obstacle,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
-			obstacles[i].setPosition(roads[i].getPosition());
+
+			tempPosition = roads[i].getPosition();
+
+			angle = roads[i].getRotationY();
+
+			horOffset = ((int)maxHorOffset - minHorOffset) * ( (double)rand() / (double)RAND_MAX ) + minHorOffset;
+
+			Vector3 temp1 = Vector3(horOffset,0, 0);
+
+			Matrix m1;
+
+			Identity(&m1);
+			RotateY(&m1, ToRadian(angle));
+
+			Vector3 eV;
+
+			Transform(&eV, &temp1,&m1);
+
+
+			if(i>0)
+			{
+				Vector3 newPosition = roads[i-1].getPosition() +  eV;
+				obstacles[i].setPosition(newPosition);
+			}
+			else
+			{
+				obstacles[i].setPosition(roads[i].getPosition() + eV);
+			}
+
+			obstacles[i].setRotationY(angle);
 	}
 
 
@@ -278,17 +312,12 @@ void ColoredCubeApp::initApp()
 
 		boosts[i].setPosition(Vector3(randXPos, -1.2, randZPos));
 	}
-	float randVelocity;
+	//float randVelocity;
 	int maxVelocity = PLAYER_MAX_VELOCITY;
 
 	for(int i = 0; i < CPU_KARTS; i++) {
 		w[i] = 0;
-		randVelocity  = rand() % maxVelocity + 5;
-		if(randVelocity > PLAYER_MAX_VELOCITY)
-			randVelocity = PLAYER_MAX_VELOCITY - 1;
-		else if(randVelocity < PLAYER_MAX_VELOCITY*.75)
-			randVelocity = PLAYER_MAX_VELOCITY*.75;
-		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(0,0,randVelocity),0,1);
+		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(0,0,0),0,1);
 		CPUKarts[i].setCurrentWayPoint(Vector3(waypoints[w[i]].x + ((rand()%40)-20), waypoints[w[i]].y, waypoints[w[i]].z + ((rand()%40)-20)));
 		if (i==0) {
 			CPUKarts[i].setPosition(Vector3(playerKart.getPosition().x + 1.5, 0,playerKart.getPosition().z + 2));
@@ -395,11 +424,43 @@ void ColoredCubeApp::updateScene(float dt)
 		zLine.update(dt);
 
 		playerKart.update(dt);
-
+		
 		camera.update(dt);
+
+		float randOffset, baseVelocity;
+
+		bool kartHit;
+
 		for(int i = 0; i < CPU_KARTS; i++) {
+			randOffset = ((int)30 - (-30)) * ( (double)rand() / (double)RAND_MAX ) + (-30);
+			kartHit = false;
+			for(int j = 0;j<OBSTACLES;j++)
+			{
+				if(CPUKarts[i].collided(&obstacles[j]))
+				{
+					baseVelocity = 0.0;
+					randOffset = 20.0f;
+					kartHit = true;
+					break;
+				}
+			}
+			if(!kartHit)
+			{
+				if(playerKart.getSpeed() > PLAYER_MAX_VELOCITY/2)
+				{
+					baseVelocity = playerKart.getSpeed();
+				}
+				else
+				{
+					baseVelocity = PLAYER_MAX_VELOCITY/3;
+				}
+			}
+
+			CPUKarts[i].setSpeed(baseVelocity + randOffset);
 			CPUKarts[i].update(dt);
 		}
+
+		_RPT1(0, "KART SPEED %f \n", CPUKarts[0].getSpeed());
 		
 
 		/*for (int i = 0; i < CPU_KARTS; i++) {
@@ -458,20 +519,6 @@ void ColoredCubeApp::updateScene(float dt)
 				}
 			}
 		}
-		/*for (int j = 0; j < CPU_KARTS; j++) {
-		for(int i = 0;i<OBSTACLES;i++)
-		{
-		if(CPUKarts[j].collided(&obstacles[i]) && !CPUKarts[j].getAlreadyCollided())
-		{
-		CPUKarts[j].setAlreadyCollided(true);
-		CPUKarts[j].setVelocity(CPUKarts[j].getVelocity()/2);
-		audio->playCue(SQUEAL);
-		}else if(!CPUKarts[j].collided(&obstacles[i]) && CPUKarts[j].getAlreadyCollided()){
-		CPUKarts[j].setAlreadyCollided(false);
-		CPUKarts[j].setVelocity(CPUKarts[j].getVelocity()*2);  
-		}
-		}
-		}*/
 
 		for(int i = 0; i < CPU_KARTS; i++) {
 			if(CPUKarts[i].getPosition().z >= waypoints[w[i]].z -15 && CPUKarts[i].getPosition().x >= waypoints[w[i]].x-15 && CPUKarts[i].getPosition().z <= waypoints[w[i]].z +15 && CPUKarts[i].getPosition().x <= waypoints[w[i]].x+15) {
@@ -479,6 +526,7 @@ void ColoredCubeApp::updateScene(float dt)
 				if(w[i] == ROADS)
 					w[i] = 0;
 				CPUKarts[i].setCurrentWayPoint(Vector3(waypoints[w[i]].x + ((rand()%10)-5), waypoints[w[i]].y, waypoints[w[i]].z + ((rand()%10)-5)));
+				CPUKarts[i].setRotationY(roads[w[i]].getRotationY());
 			}
 		}
 
@@ -502,36 +550,6 @@ void ColoredCubeApp::updateScene(float dt)
 				audio->playCue(REV);
 			}
 		}
-
-		/*KartPlace place;
-		GameObject* allKarts = new GameObject[CPU_KARTS+1];
-
-
-		//KartPlace place;
-		//GameObject allKarts[CPU_KARTS+1];
-
-		for(int i = 0;i<CPU_KARTS;i++)
-		{
-		allKarts[i] = CPUKarts[i];
-		}
-
-		allKarts[CPU_KARTS] = playerKart;*/
-		/*mLight2.pos = D3DXVECTOR3(playerKart.getPosition().x + .25, playerKart.getPosition().y, playerKart.getPosition().z);
-		mLight3.pos = D3DXVECTOR3(playerKart.getPosition().x + .75, playerKart.getPosition().y, playerKart.getPosition().z);*/
-
-		/*GameObject* places = place.getKartsPlaces(allKarts, CPU_KARTS+1);
-
-		playerPosition = place.getPlayerPosition(places, CPU_KARTS+1);
-
-		for(int i = 0;i<CPU_KARTS+1;i++){
-		if(allKarts[i].getPosition().z + 4.0f >= (ROADS * ROAD_LENGTH)){
-		gameOver = true;
-		gameStates = endGame;
-		}
-		//place.printTopThree(places, CPU_KARTS+1);
-		}*/
-
-
 	}
 	else if(gameStates == endGame){
 		splash.setPosition(playerKart.getPosition());

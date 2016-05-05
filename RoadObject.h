@@ -33,7 +33,7 @@ public:
 	void setRotationX(float r) {rotX = r;}
 	void setRotationY(float r) {rotY = r;}
 	void setRotationZ(float r) {rotZ = r;}
-
+	float getRotationY() {return rotY;}
 private:
 	Road *road; 
 	Vector3 position;

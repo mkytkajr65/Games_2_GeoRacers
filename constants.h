@@ -15,7 +15,7 @@
 #define Transform D3DXVec3TransformCoord
 
 const int ROADS = 360;
-const int OBSTACLES = 20;
+const int OBSTACLES = ROADS;
 const int CPU_KARTS = 3;
 const int POWER_UPS = 8;
 

@@ -41,6 +41,7 @@ void CPUKartObject::update(float dt)
 	Vector3 direction = currentWayPoint - position;
 	D3DXVec3Normalize(&direction, &direction);
 	velocity = Vector3(currentForwardSpeed*direction.x, 0, currentForwardSpeed*direction.z);
+
 	Matrix rotXM, rotYM, rotZM, transM;
 	RotateX(&rotXM, rotX);
 	RotateY(&rotYM, rotY);
