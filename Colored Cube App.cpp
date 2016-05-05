@@ -310,6 +310,41 @@ void ColoredCubeApp::initApp()
 			boosts[i].setRotationY(angle);
 			obstacles[i].setRotationY(angle);
 	}
+	
+	int interval = (ROADS / POWER_UPS )- 1;
+
+	for(int i = 0; i < POWER_UPS; i++) {
+			boosts[i].init(&boostBox,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
+
+			tempPosition = roads[i * interval].getPosition();
+
+			angle = roads[(i*interval)].getRotationY();
+
+			horOffset = ((int)maxHorOffset - minHorOffset) * ( (double)rand() / (double)RAND_MAX ) + minHorOffset;
+
+			Vector3 temp1 = Vector3(horOffset,0, 0);
+
+			Matrix m1;
+
+			Identity(&m1);
+			RotateY(&m1, ToRadian(angle));
+
+			Vector3 eV;
+
+			Transform(&eV, &temp1,&m1);
+
+			if(i>0)
+			{
+				Vector3 newPosition = roads[(i*interval)-1].getPosition() +  eV;
+				boosts[i].setPosition(newPosition);
+			}
+			else
+			{
+				boosts[i].setPosition(roads[(i*interval)].getPosition() + eV);
+			}
+
+			boosts[i].setRotationY(angle);
+	}
 	//float randVelocity;
 	int maxVelocity = PLAYER_MAX_VELOCITY;
 
@@ -431,14 +466,14 @@ void ColoredCubeApp::updateScene(float dt)
 		bool kartHit;
 
 		for(int i = 0; i < CPU_KARTS; i++) {
-			randOffset = ((int)30 - (-30)) * ( (double)rand() / (double)RAND_MAX ) + (-30);
+			randOffset = ((int)60 - (-10)) * ( (double)rand() / (double)RAND_MAX ) + (-20);
 			kartHit = false;
 			for(int j = 0;j<OBSTACLES;j++)
 			{
 				if(CPUKarts[i].collided(&obstacles[j]))
 				{
 					baseVelocity = 0.0;
-					randOffset = 20.0f;
+					randOffset = 5.0f;
 					kartHit = true;
 					break;
 				}

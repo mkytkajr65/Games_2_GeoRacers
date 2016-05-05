@@ -17,7 +17,8 @@
 const int ROADS = 360;
 const int OBSTACLES = ROADS;
 const int CPU_KARTS = 3;
-const int POWER_UPS = ROADS;
+const int POWER_UPS = 25;
+
 
 const char WAVE_BANK[]  = "..\\Games_2_GeoRacers\\audio\\Win\\Wave Bank.xwb";
 // SOUND_BANK must be location of .xsb file.
@@ -29,11 +30,11 @@ const char CIRCUIT[] = "Circuit";
 const float PLAYER_MAX_ACCELERATION = 0.1f;
 const float PLAYER_MAX_VELOCITY = 200.0f;
 const float INITIAL_PLAYER_JUMP_VELOCITY = 30.0f;
-const float GRAVITY = 0.1f;
+const float GRAVITY = 0.45f;
 const float ROAD_WIDTH = 50.0f;
 const float ROAD_LENGTH = 50.0f;
-const float BOOST_VELOCITY = 400.0f;
-const float MAX_BOOST_TIME = 3.0f;
+const float BOOST_VELOCITY = 250.0f;
+const float MAX_BOOST_TIME = 2.5f;
 
 enum GameStates {gameMenu, gamePlay, endGame};
 
