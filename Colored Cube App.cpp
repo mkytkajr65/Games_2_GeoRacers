@@ -76,7 +76,7 @@ private:
 	ObstacleObject obstacles[OBSTACLES];
 	PowerUpObject boosts[POWER_UPS];
 	int laps;
-
+	int cLaps[CPU_KARTS];
 
 	TreeSprites mTrees;
 	Road road;
@@ -262,7 +262,7 @@ void ColoredCubeApp::initApp()
 
 	float roadXLength = 20;
 
-	float horOffset, fbOffset;
+	float horOffset, fbOffset, powOffset;
 
 	Vector3 tempPosition;
 
@@ -271,14 +271,17 @@ void ColoredCubeApp::initApp()
 
 	for(int i = 0; i < OBSTACLES; i++) {
 			obstacles[i].init(&obstacle,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
+			boosts[i].init(&boostBox,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
 
 			tempPosition = roads[i].getPosition();
 
 			angle = roads[i].getRotationY();
 
 			horOffset = ((int)maxHorOffset - minHorOffset) * ( (double)rand() / (double)RAND_MAX ) + minHorOffset;
+			powOffset = ((int)maxHorOffset - minHorOffset) * ( (double)rand() / (double)RAND_MAX ) + minHorOffset;
 
 			Vector3 temp1 = Vector3(horOffset,0, 0);
+			Vector3 temp2 = Vector3(powOffset, 0, 0);
 
 			Matrix m1;
 
@@ -286,37 +289,33 @@ void ColoredCubeApp::initApp()
 			RotateY(&m1, ToRadian(angle));
 
 			Vector3 eV;
+			Vector3 pV;
 
 			Transform(&eV, &temp1,&m1);
+			Transform(&pV, &temp2, &m1);
 
 
 			if(i>0)
 			{
-				Vector3 newPosition = roads[i-1].getPosition() +  eV;
-				obstacles[i].setPosition(newPosition);
+				Vector3 newPosition1 = roads[i-1].getPosition() +  eV;
+				Vector3 newPosition2 = roads[i-1].getPosition() + pV;
+				obstacles[i].setPosition(newPosition1);
+				boosts[i].setPosition(newPosition2);
 			}
 			else
 			{
 				obstacles[i].setPosition(roads[i].getPosition() + eV);
+				boosts[i].setPosition(roads[i].getPosition() + pV);
 			}
-
+			boosts[i].setRotationY(angle);
 			obstacles[i].setRotationY(angle);
-	}
-
-
-	for(int i = 0; i < POWER_UPS; i++) {
-		boosts[i].init(&boostBox,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
-
-		randZPos = ((int)totalRoadZLength - 25) * ( (double)rand() / (double)RAND_MAX ) + 25;
-		randXPos = (rand() % (int)roadXLength)-10;
-
-		boosts[i].setPosition(Vector3(randXPos, -1.2, randZPos));
 	}
 	//float randVelocity;
 	int maxVelocity = PLAYER_MAX_VELOCITY;
 
 	for(int i = 0; i < CPU_KARTS; i++) {
 		w[i] = 0;
+		cLaps[i] = 0;
 		CPUKarts[i].init(&cKart,2,Vector3(0,0,0),Vector3(0,0,0),0,1);
 		CPUKarts[i].setCurrentWayPoint(Vector3(waypoints[w[i]].x + ((rand()%40)-20), waypoints[w[i]].y, waypoints[w[i]].z + ((rand()%40)-20)));
 		if (i==0) {
@@ -523,8 +522,10 @@ void ColoredCubeApp::updateScene(float dt)
 		for(int i = 0; i < CPU_KARTS; i++) {
 			if(CPUKarts[i].getPosition().z >= waypoints[w[i]].z -15 && CPUKarts[i].getPosition().x >= waypoints[w[i]].x-15 && CPUKarts[i].getPosition().z <= waypoints[w[i]].z +15 && CPUKarts[i].getPosition().x <= waypoints[w[i]].x+15) {
 				w[i] = w[i] + 1;
-				if(w[i] == ROADS)
+				if(w[i] == ROADS) {
 					w[i] = 0;
+					cLaps[i]++;
+				}
 				CPUKarts[i].setCurrentWayPoint(Vector3(waypoints[w[i]].x + ((rand()%10)-5), waypoints[w[i]].y, waypoints[w[i]].z + ((rand()%10)-5)));
 				CPUKarts[i].setRotationY(roads[w[i]].getRotationY());
 			}
@@ -547,8 +548,17 @@ void ColoredCubeApp::updateScene(float dt)
 			if(boosts[i].collided(&playerKart) && !playerKart.getHasBoost()) {
 				boosts[i].setInActive();
 				playerKart.setHasBoost(true);
-				audio->playCue(REV);
 			}
+		}
+		int placementCounter = 0;
+		for(int i = 0; i < CPU_KARTS; i++) {
+			if(w[CPU_KARTS] > w[i] || (w[CPU_KARTS] <= w[i] && laps > cLaps[i])) {
+				placementCounter++;
+			}
+		}
+		playerPosition = 4 - placementCounter;
+		if((GetAsyncKeyState('B') & 0x8000) && playerKart.getHasBoost()){
+			audio->playCue(REV);
 		}
 	}
 	else if(gameStates == endGame){
@@ -656,18 +666,53 @@ void ColoredCubeApp::updateScene(float dt)
 			float roadXLength = 20;
 
 
-			for(int i = 0; i < OBSTACLES; i++) {
-			obstacles[i].init(&obstacle,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
-			obstacles[i].setPosition(roads[i].getPosition());
-	}
+			float horOffset, fbOffset, powOffset;
 
-			for(int i = 0; i < POWER_UPS; i++) {
+			Vector3 tempPosition;
+
+			float maxHorOffset = ROAD_WIDTH/2;
+			float minHorOffset = -ROAD_WIDTH/2;
+
+			for(int i = 0; i < OBSTACLES; i++) {
+				obstacles[i].init(&obstacle,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
 				boosts[i].init(&boostBox,1.0f,Vector3(0,0,0),Vector3(0,0,0),0,1);
 
-				randZPos = ((int)totalRoadZLength - 25) * ( (double)rand() / (double)RAND_MAX ) + 25;
-				randXPos = (rand() % (int)roadXLength)-10;
+				tempPosition = roads[i].getPosition();
 
-				boosts[i].setPosition(Vector3(randXPos, -1.2, randZPos));
+				angle = roads[i].getRotationY();
+
+				horOffset = ((int)maxHorOffset - minHorOffset) * ( (double)rand() / (double)RAND_MAX ) + minHorOffset;
+				powOffset = ((int)maxHorOffset - minHorOffset) * ( (double)rand() / (double)RAND_MAX ) + minHorOffset;
+
+				Vector3 temp1 = Vector3(horOffset,0, 0);
+				Vector3 temp2 = Vector3(powOffset, 0, 0);
+
+				Matrix m1;
+
+				Identity(&m1);
+				RotateY(&m1, ToRadian(angle));
+
+				Vector3 eV;
+				Vector3 pV;
+
+				Transform(&eV, &temp1,&m1);
+				Transform(&pV, &temp2, &m1);
+
+
+				if(i>0)
+				{
+					Vector3 newPosition1 = roads[i-1].getPosition() +  eV;
+					Vector3 newPosition2 = roads[i-1].getPosition() + pV;
+					obstacles[i].setPosition(newPosition1);
+					boosts[i].setPosition(newPosition2);
+				}
+				else
+				{
+					obstacles[i].setPosition(roads[i].getPosition() + eV);
+					boosts[i].setPosition(roads[i].getPosition() + pV);
+				}
+				boosts[i].setRotationY(angle);
+				obstacles[i].setRotationY(angle);
 			}
 
 			float randVelocity;
